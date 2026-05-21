@@ -2651,11 +2651,22 @@
 
     <section class="slide">
       <div class="kicker">第二部分 Agent 开发入门 / 总结</div>
-      <h2>从 S01 到 S19：把 Agent 从能跑，做到能协作</h2>
+      <h2>把全部机制，归到一个循环 s01~s19</h2>
       <div class="summary-map">
         <div class="summary-core">
-          <strong>一条主线：把经验变成可运行、可恢复、可扩展的 Agent 系统。</strong>
-          <span>Skill 负责沉淀可复用能力；Agent Loop 负责行动闭环；工程化层负责安全、状态和恢复；平台层负责长期任务和多 Agent 协作。</span>
+          <span style="white-space: pre-wrap;">用户输入
+  → UserPromptSubmit hooks
+  → cron/background 通知注入
+  → context compact
+  → memory + skills + MCP 状态组装 system prompt
+  → LLM
+  → has tool_use block?
+      否 → Stop hooks → 返回
+      是 → PreToolUse hooks + permission
+          → TOOL_HANDLERS / MCP handlers / background dispatch
+          → PostToolUse hooks
+          → tool_result / task_notification 回 messages
+          → 下一轮</span>
         </div>
         <div class="chapter-map">
           <div class="chapter-band">
