@@ -434,9 +434,6 @@
       border-radius: 8px;
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
-      max-height: 38vh;
-      object-fit: cover;
-      object-position: top center;
     }
 
     .media-panel {
@@ -730,32 +727,6 @@
       font-size: 16px;
       line-height: 1.42;
       font-weight: 620;
-    }
-
-    .code-shot {
-      display: block;
-      width: 100%;
-      height: auto;
-      margin: 0 auto;
-    }
-
-    .code-shot img {
-      width: 100%;
-      height: auto;
-      display: block;
-      object-fit: cover;
-      object-position: top center;
-      border-radius: 8px;
-    }
-
-    .visual-panel.code-panel {
-      background: transparent;
-      border: 0;
-      box-shadow: none;
-      padding: 0;
-      min-height: 0;
-      justify-content: flex-start;
-      align-items: stretch;
     }
 
     .visual-flow {
@@ -2064,19 +2035,28 @@
         <div class="lesson-copy">
           <p class="source-note">工具是 Agent 和真实世界之间的接口，必须同时给模型「说明书」和给程序「执行函数」。</p>
           <div class="plain-points">
-            <div class="plain-point"><strong>要解决的问题：</strong>只有 bash 时, 所有操作都走 shell。cat 截断不可预测, sed 遇到特殊字符就崩, 每次 bash 调用都是不受约束的安全面。</div>
+            <div class="plain-point"><strong>要解决的问题：</strong>没有工具，Agent 只能聊；有了 read_file、write_file、bash、search，它才开始能做事。</div>
             <div class="plain-point"><strong>核心机制：</strong>schema 告诉模型工具名、参数和用途；handler 在宿主侧接收参数并返回结果。</div>
-            <div class="plain-point analogy"><strong>API 协议有三条硬性约束:</strong>
-              <br>
-            - 每个 tool_use 块必须有匹配的 tool_result (通过 tool_use_id 关联)<br>
-            - user / assistant 消息必须严格交替 (不能连续两条同角色)<br>
-            - 只接受协议定义的字段 (内部元数据会导致 400 错误)</div>
-            
+            <div class="plain-point analogy"><strong>可以这样理解：</strong>schema 像菜单，handler 像后厨。模型点菜，程序做菜，结果再端回上下文。</div>
+            <div class="plain-point"><strong>工程重点：</strong>强工具必须有边界：校验路径、限制命令、设置超时、截断大输出、把错误包装成模型能理解的信息。</div>
           </div>
         </div>
         <div class="visual-panel">
-            <img class="code-shot"  src="assets/tool-route-schema-handler.png" alt="tool route schema handler screenshot">
-          <p class="mini-text">工具不是越多越好，关键是每个工具的用途、输入、风险和返回格式都足够清楚。</p>
+          <div class="visual-title">工具路由：模型看 schema，程序跑 handler</div>
+          <div class="router-map">
+            <div class="tool-stack">
+              <div class="tool-chip">read_file <span>读项目文件</span></div>
+              <div class="tool-chip">write_file <span>修改文件</span></div>
+              <div class="tool-chip">bash <span>运行命令</span></div>
+              <div class="tool-chip">search <span>查外部资料</span></div>
+            </div>
+            <div class="route-box">
+              <div class="route-line"><b>模型选择工具</b><em>→</em><b>参数按 schema 填写</b></div>
+              <div class="route-line"><b>权限和校验</b><em>→</em><b>handler 真实执行</b></div>
+              <div class="route-line"><b>工具返回结果</b><em>→</em><b>写回 messages</b></div>
+            </div>
+          </div>
+          <p class="mini-text">讲解重点：工具不是越多越好，关键是每个工具的用途、输入、风险和返回格式都足够清楚。</p>
         </div>
       </div>
       <div class="footer"><span>工具 = schema + handler + 结果回写</span><span>11</span></div>
@@ -2089,10 +2069,10 @@
         <div class="lesson-copy">
           <p class="source-note">Todo 不是给用户看的装饰，而是给 Agent 自己用的短期工作台。</p>
           <div class="plain-points">
-            <div class="plain-point"><strong>要解决的问题：</strong>到了 s02，agent 已经会读文件、写文件、跑命令。
-问题也马上出现了：<br>多步任务容易走一步忘一步。<br>明明已经做过的检查，会重复再做。<br>一口气列出很多步骤后，很快又回到即兴发挥</div>
-            <div class="plain-point"><strong>核心机制：</strong>把计划拆成 pending、in_progress、completed 三类状态，执行过程中持续更新。同一时间只允许一个 in_progress；完成后要更新状态；计划变化要同步调整而不是硬撑旧计划。</div>
+            <div class="plain-point"><strong>要解决的问题：</strong>任务一长，模型容易忘记已经做过什么、下一步该做什么、哪些检查还没完成。</div>
+            <div class="plain-point"><strong>核心机制：</strong>把计划拆成 pending、in_progress、completed 三类状态，执行过程中持续更新。</div>
             <div class="plain-point analogy"><strong>可以这样理解：</strong>Todo 像施工看板，让 Agent 每次行动前都能看见「当前唯一焦点」。</div>
+            <div class="plain-point"><strong>工程重点：</strong>同一时间只允许一个 in_progress；完成后要更新状态；计划变化要同步调整而不是硬撑旧计划。</div>
           </div>
         </div>
         <div class="visual-panel">
@@ -2125,21 +2105,36 @@
       <h2>子代理：把局部探索放到独立上下文</h2>
       <div class="lesson-layout">
         <div class="lesson-copy">
-          <p class="source-note">一个大任务，不一定要塞进一个上下文里做完。</p>
+          <p class="source-note">子代理用独立上下文做局部任务，主代理保留决策权和最终整合权。</p>
           <div class="plain-points">
-            <div class="plain-point"><strong>要解决的问题：</strong>当 agent 连续做很多事时，messages 会越来越长。比如用户只问：“这个项目用什么测试框架？” <br>但 agent 可能为了回答这个问题 开始扫仓库、查资料会产生大量中间信息，直接塞进主上下文会很快变乱。<br>真正有价值的最终答案，可能只有一句话：“这个项目主要是技术分享。”</div>
-            <div class="plain-point"><strong>核心机制：</strong>
-当前正在和用户对话的agent就是父智能体。父智能体临时派生出来，专门处理某个子任务的 agent，就是子智能体。子智能体也有自己的 messages，不会和父智能体的 messages 混淆。</div>
-            <div class="plain-point analogy"><strong>可以这样理解：</strong>把局部任务放进独立上下文里做，做完只把必要结果带回来。</div>
+            <div class="plain-point"><strong>要解决的问题：</strong>扫仓库、查资料、跑验证会产生大量中间信息，直接塞进主上下文会很快变乱。</div>
+            <div class="plain-point"><strong>核心机制：</strong>主 Agent 发出清晰任务；子 Agent 在自己的上下文里探索；最后只返回摘要、证据和建议。</div>
+            <div class="plain-point analogy"><strong>可以这样理解：</strong>主代理像负责人，子代理像临时调研员；调研员带回结论，不把全部草稿搬进会议室。</div>
+            <div class="plain-point"><strong>工程重点：</strong>任务边界要窄，输入资料要少，输出格式要固定；不要把子会话原文整段回填。</div>
           </div>
         </div>
         <div class="visual-panel">
-          <div class="visual-title">子智能体通常不需要拥有和父智能体完全一样的能力。</div>
-          <img class="screenshot" src="assets/subagent-context-map.png" alt="subagent context map screenshot">
-          <p class="mini-text">父智能体除了文件读取、搜索、bash 之类的基础工具。它还有派生子智能体的能力</p>
+          <div class="visual-title">上下文隔离：探索在旁路，决策在主线</div>
+          <div class="parent-child">
+            <div class="context-box">
+              <h3>主 Agent</h3>
+              <p>保存用户目标、全局约束、最终方案。</p>
+              <div class="context-token">任务拆分</div>
+              <div class="context-token">派发子任务</div>
+              <div class="context-token">整合结论并执行</div>
+            </div>
+            <div class="context-box child">
+              <h3>子 Agent</h3>
+              <p>只处理一个局部问题，用完即返回。</p>
+              <div class="context-token">查认证代码在哪里</div>
+              <div class="context-token">收集文件和行号证据</div>
+              <div class="return-summary">返回：摘要 + 证据 + 风险</div>
+            </div>
+          </div>
+          <p class="mini-text">讲解重点：并行不是目的，隔离噪音才是目的；主代理需要的是可信结论，而不是更多上下文。</p>
         </div>
       </div>
-      <div class="footer"><span>并行不是目的，隔离噪音才是目的</span><span>13</span></div>
+      <div class="footer"><span>子代理负责探索，主代理负责决策</span><span>13</span></div>
     </section>
 
     <section class="slide">
@@ -2149,21 +2144,10 @@
         <div class="lesson-copy">
           <p class="source-note">Skill 是可发现、可按需加载的能力包；常驻的是目录，不是全部正文。</p>
           <div class="plain-points">
-            <div class="plain-point"><strong>要解决的问题：</strong>
-                <br>不同任务需要的领域知识不一样
-              <br>
-              写日报、周报  <br>
-              写活动需求文档  <br>
-              做PPT演示文稿  <br>
-
-</div>
-            <div class="plain-point"><strong>核心机制：</strong>启动时扫描 name 和 description；把 skill 目录放进 system prompt；提供一个load_skill 函数，当任务命中特定能力，load_skill再读取对应 SKILL.md、脚本和资源。</div>
-            <div class="plain-point analogy"><strong>skill、memory、CLAUDE.md|AGENT.md 的边界</strong>
-              <p>这是某类任务才需要的做法或知识：skill</p>
-              <p>这是需要长期记住的事实或偏好：memory</p>
-              <p>这是更稳定的全局规则：CLAUDE.md|AGENT.md</p>
-
-</div>
+            <div class="plain-point"><strong>要解决的问题：</strong>几十个 Skill 全塞进系统提示词会浪费上下文，也会让模型被无关规则干扰。</div>
+            <div class="plain-point"><strong>核心机制：</strong>启动时扫描 name 和 description；当任务命中特定能力，再读取对应 SKILL.md、脚本和资源。</div>
+            <div class="plain-point analogy"><strong>可以这样理解：</strong>Skill 像工具书目录：先看目录决定要不要翻书，真正需要时再打开那一章。</div>
+            <div class="plain-point"><strong>工程重点：</strong>description 要写清触发场景；SKILL.md 要给步骤、边界、示例、验证方式；引用文件路径必须可靠。</div>
           </div>
         </div>
         <div class="visual-panel">
@@ -2194,24 +2178,35 @@
         <div class="lesson-copy">
           <p class="source-note">压缩不是简单变短，而是把后续继续工作必需的状态留下来。</p>
           <div class="plain-points">
-            <div class="plain-point"><strong>要解决的问题：</strong>前面讲到了s05，agent 已经会：读写文件、规划步骤、派子 agent、按需加载 skill。
-也正因为它会做的事情更多了，上下文会越来越快膨胀读。一个大文件，会塞进很多文本。跑一条长命令，会得到大段输出。多轮任务推进后，旧结果会越来越多。API 请求越来越重，越来越贵......</div>
-            <div class="plain-point"><strong>核心机制：</strong>
-             上下文压缩的核心，不是尽量少字，而是让模型在更短的活跃上下文里，仍然保住继续工作的连续性。
-            
-            </div>
-            <div class="plain-point analogy"><strong>先记三层，不要一上来记八层十层</strong> <p>第 1 层：大结果不直接塞进上下文。写到磁盘，只留预览</p>
-              <p>第 2 层：旧结果不一直原样保留。替换成简短占位，used tool with id：tool_call_id</p>
-              <p>第 3 层：整体历史太长时。生成一份连续性摘要</p></div>
+            <div class="plain-point"><strong>要解决的问题：</strong>长对话、搜索结果、日志和代码输出会挤占上下文，导致 Agent 忘记目标或丢掉关键约束。</div>
+            <div class="plain-point"><strong>核心机制：</strong>原始记录落盘；上下文里留下摘要、当前目标、已做决策和下一步。</div>
+            <div class="plain-point analogy"><strong>可以这样理解：</strong>压缩像会议纪要：不复印所有聊天记录，只保留继续推进项目所需的信息。</div>
+            <div class="plain-point"><strong>工程重点：</strong>保留可追溯性；明确哪些内容可丢、哪些必须留；压缩后 Agent 应该能无缝接着干。</div>
           </div>
         </div>
         <div class="visual-panel">
           <div class="visual-title">压缩策略：原文可追溯，当前状态可继续</div>
-          <img class="screenshot" src="assets/context-compaction-auto.png" alt="context compaction auto screenshot">
-          <p class="mini-text">手动压缩和自动压缩复用同一条机制</p>
+          <div class="compact-layers">
+            <div class="compact-layer">
+              <div class="compact-cell">原始记录<span>完整对话、工具输出、日志</span></div>
+              <div class="compact-cell keep">落盘保存<span>transcript</span></div>
+              <div class="compact-cell keep">必要时回查<span>保证证据不丢</span></div>
+            </div>
+            <div class="compact-layer">
+              <div class="compact-cell">保留状态<span>继续工作所需</span></div>
+              <div class="compact-cell keep">目标 / 约束<span>用户要什么，不能做什么</span></div>
+              <div class="compact-cell keep">决策 / 下一步<span>已经决定什么，接下来做什么</span></div>
+            </div>
+            <div class="compact-layer">
+              <div class="compact-cell">丢弃噪音<span>不再逐字保留</span></div>
+              <div class="compact-cell">重复输出<span>长日志、重复搜索片段</span></div>
+              <div class="compact-cell">中间草稿<span>已被结论覆盖的信息</span></div>
+            </div>
+          </div>
+          <p class="mini-text">压缩成功的标准不是 token 变少，而是换一个 Agent 读完摘要也能继续完成任务。</p>
         </div>
       </div>
-      <div class="footer"><span>压缩不是“把历史缩短”这么简单</span><span>15</span></div>
+      <div class="footer"><span>压缩的目标是可继续工作</span><span>15</span></div>
     </section>
 
     <section class="slide">
@@ -2219,21 +2214,33 @@
       <h2>权限系统：工具调用先过安全闸</h2>
       <div class="lesson-layout">
         <div class="lesson-copy">
-          <p class="source-note">“意图”不能直接变成“执行”，中间必须经过权限检查。</p>
+          <p class="source-note">工具越强，越不能让模型直接越过安全边界；权限判断必须在执行前发生。</p>
           <div class="plain-points">
-            <div class="plain-point"><strong>要解决的问题：</strong>模型可能会写错文件，模型可能会执行危险命令，模型可能会在不该动手的时候动手</div>
-            <div class="plain-point"><strong>核心机制：</strong>模型可以提出行动建议，但真正执行之前，必须先过安全关。</div>
-            <div class="plain-point analogy"><strong>简单讲4步</strong>
-              <p>第 1 步先看 deny rules。因为有些东西不应该交给“模式”去决定。比如：明显危险的命令、明显越界的路径 这些应该优先挡掉。</p>
-              <p>第 2 步看 mode。因为模式决定当前会话的大方向。例如在 plan 模式下，系统就应该天然更保守。</p>
-              <p>第 3 步看 allow rules。有些安全、重复、常见的操作可以直接过。比如：读文件、搜索代码、查看 git 状态</p>
-              <p>第 4 步才 ask。前面都没命中的灰区，才交给用户。</p>
-            </div>
+            <div class="plain-point"><strong>要解决的问题：</strong>删除文件、执行命令、联网请求、写入外部系统都可能造成真实损失。</div>
+            <div class="plain-point"><strong>核心机制：</strong>每个工具调用先进入 policy check，再得到 allow、ask user、deny 三种结果。</div>
+            <div class="plain-point analogy"><strong>可以这样理解：</strong>权限系统像门禁：模型可以提出想进哪扇门，但开不开门由宿主程序决定。</div>
+            <div class="plain-point"><strong>工程重点：</strong>规则要可解释、可审计、可配置；默认收紧高风险能力，低风险读操作才适合自动放行。</div>
           </div>
         </div>
         <div class="visual-panel">
-          <div class="visual-title">最小实现怎么写</div>
-          <img class="screenshot" src="assets/permission-flow.png" alt="permission flow screenshot">
+          <div class="visual-title">权限闸门：工具调用先分类，再执行</div>
+          <div class="decision-map">
+            <div class="decision-row">
+              <div class="decision-cell">工具请求<span>read_file src/app.ts</span></div>
+              <div class="decision-cell allow">ALLOW<span>低风险、命中白名单</span></div>
+              <div class="decision-cell allow">直接执行<span>结果写回上下文</span></div>
+            </div>
+            <div class="decision-row">
+              <div class="decision-cell">工具请求<span>git push / rm / 外部写入</span></div>
+              <div class="decision-cell ask">ASK USER<span>有副作用或不可逆</span></div>
+              <div class="decision-cell ask">等待确认<span>用户同意后才继续</span></div>
+            </div>
+            <div class="decision-row">
+              <div class="decision-cell">工具请求<span>越权路径 / 敏感数据</span></div>
+              <div class="decision-cell deny">DENY<span>违反边界</span></div>
+              <div class="decision-cell deny">阻断并解释<span>不进入 handler</span></div>
+            </div>
+          </div>
           <p class="mini-text">权限判断属于系统责任，不能让模型自己决定「这次应该安全」。</p>
         </div>
       </div>
@@ -2247,16 +2254,22 @@
         <div class="lesson-copy">
           <p class="source-note">Hook 把日志、审计、格式化、通知等横切能力放到生命周期节点上，而不是塞进主循环。</p>
           <div class="plain-points">
-            <div class="plain-point"><strong>要解决的问题：</strong>在某个固定时机顺手做一点事，不改主循环主体，也能接入额外规则，让用户或插件在系统边缘扩展能力。
-              <br>比如 会话开始时打印欢迎信息、工具执行前做一次额外检查、工具执行后补一条审计日志</div>
+            <div class="plain-point"><strong>要解决的问题：</strong>Agent 主循环会越来越重：既要运行工具，又要记录日志、做审计、发通知、补权限。</div>
             <div class="plain-point"><strong>核心机制：</strong>在 SessionStart、PreToolUse、PostToolUse、Stop 等阶段触发 hook。</div>
             <div class="plain-point analogy"><strong>可以这样理解：</strong>Hook 像流程里的插座：核心电路不变，需要扩展时把插件接上去。</div>
+            <div class="plain-point"><strong>工程重点：</strong>hook 输入输出要稳定；失败要隔离；慢 hook 要超时；不能因为扩展失败拖垮主流程。</div>
           </div>
         </div>
         <div class="visual-panel">
           <div class="visual-title">生命周期 Hook：扩展挂在节点上</div>
-          <img class="screenshot" src="assets/hook-flow.png" alt="hook flow screenshot">
-          <p class="mini-text">Hook 的价值是让核心循环保持干净，同时给团队留下稳定的扩展点。</p>
+          <div class="hook-timeline">
+            <div class="hook-stage active"><strong>SessionStart</strong><span>加载规则、初始化日志、准备环境。</span></div>
+            <div class="hook-stage"><strong>UserPromptSubmit</strong><span>记录输入、补充上下文、做前置检查。</span></div>
+            <div class="hook-stage active"><strong>PreToolUse</strong><span>权限补丁、参数检查、审计记录。</span></div>
+            <div class="hook-stage active"><strong>PostToolUse</strong><span>截断输出、格式化结果、写入追踪。</span></div>
+            <div class="hook-stage"><strong>Stop</strong><span>收尾通知、保存状态、生成摘要。</span></div>
+          </div>
+          <p class="mini-text">讲解重点：Hook 的价值是让核心循环保持干净，同时给团队留下稳定的扩展点。</p>
         </div>
       </div>
       <div class="footer"><span>Hook 让核心循环保持干净</span><span>17</span></div>
@@ -2269,33 +2282,24 @@
         <div class="lesson-copy">
           <p class="source-note">记忆不是聊天记录仓库，而是把未来还会用到的事实、偏好和项目规则保存下来。</p>
           <div class="plain-points">
-            <div class="plain-point"><strong>要解决的问题：</strong>如果一个 agent 每次新会话都完全从零开始，它就会不断重复忘记这些事情，会忘记项目怎么跑、用户偏好、团队约定和上次验证过的结论。</div>
-            <div class="plain-point"><strong>核心机制：</strong>不只保存“你做错了”，也要保存“这样做是对的”。有些东西即使用户要求你存，也不该直接存。用户说“忽略 memory”时，就当它是空的。在这一轮里，按 memory 为空来工作</div>
-            <div class="plain-point analogy"><strong>哪些东西不要存进 memory ：</strong>
-
-              <p>文件结构、函数签名、目录布局</p>
-              <p>当前任务进度</p>
-              <p>临时分支名、当前 PR 号</p>
-              <p>修 bug 的具体代码细节</p>
-              <p>密钥、密码、凭证</p>
-            </div>
+            <div class="plain-point"><strong>要解决的问题：</strong>跨会话后，Agent 会忘记项目怎么跑、用户偏好、团队约定和上次验证过的结论。</div>
+            <div class="plain-point"><strong>核心机制：</strong>区分短期状态、长期记忆、项目规则、原始记录；按需要检索，而不是全量塞回提示词。</div>
+            <div class="plain-point analogy"><strong>可以这样理解：</strong>记忆像工程手册，不是监控录像；要写能指导下一次行动的信息。</div>
+            <div class="plain-point"><strong>工程重点：</strong>记忆要有来源和时间；能更新、能冲突处理；当前文件和当前验证永远优先于旧记忆。</div>
           </div>
         </div>
         <div class="visual-panel">
-          <div class="visual-title">memory 保存的是“以后还可能有价值、但当前代码里不容易直接重新看出来”的信息。</div>
+          <div class="visual-title">记忆分层：不同信息放不同位置</div>
           <div class="memory-grid">
-
-            <div class="memory-card core"><strong>用户偏好</strong><span>回答希望简洁还是详细、更偏好什么工具链、明确说过要记住的默认值。</span></div>
-
+            <div class="memory-card"><strong>短期状态</strong><span>当前任务、当前计划、正在处理的文件。会话结束后不一定保留。</span></div>
             <div class="memory-card core"><strong>项目规则</strong><span>测试命令、目录约定、代码风格、部署入口。下次任务仍然有用。</span></div>
-             <div class="memory-card"><strong>明确纠正过</strong><span>不要这样改、这个判断方式之前错过、以后遇到这种情况要先做 X</span></div>
-
-            <div class="memory-card"><strong>外部资源指针</strong><span>某个问题单在哪个看板里、某个监控面板在哪里、某个资料库在哪个 URL</span></div>
+            <div class="memory-card core"><strong>用户偏好</strong><span>输出习惯、常用流程、明确说过要记住的默认值。</span></div>
+            <div class="memory-card"><strong>原始记录</strong><span>完整日志、历史对话、工具输出。用于追溯，不默认塞进上下文。</span></div>
           </div>
           <p class="mini-text">好记忆要能回答「下次遇到同类任务，它能少走哪一步弯路？」</p>
         </div>
       </div>
-      <div class="footer"><span></span><span>18</span></div>
+      <div class="footer"><span>记忆不是聊天记录仓库</span><span>18</span></div>
     </section>
 
     <section class="slide">
@@ -2349,15 +2353,20 @@
           <p class="source-note">好 Agent 不是不失败，而是能把失败转成可理解的状态，并选择下一步恢复动作。</p>
           <div class="plain-points">
             <div class="plain-point"><strong>要解决的问题：</strong>命令失败、路径不存在、网络超时、权限拒绝都会打断任务；整屏 stderr 会让模型更混乱。</div>
-            <div class="plain-point"><strong>核心机制：</strong>把错误分类成可重试、需改参数、需用户输入、不可恢复，并给出下一步建议。防止无限重试，让每种恢复路径各算各的次数</div>
+            <div class="plain-point"><strong>核心机制：</strong>把错误分类成可重试、需改参数、需用户输入、不可恢复，并给出下一步建议。</div>
             <div class="plain-point analogy"><strong>可以这样理解：</strong>错误恢复像客服分诊：先判断病因，再决定重试、换方案、问用户，还是明确停止。</div>
             <div class="plain-point"><strong>工程重点：</strong>返回短摘要、退出码、关键错误片段、已尝试动作和建议动作；避免把噪音原封不动塞回上下文。</div>
           </div>
         </div>
-        <div class="visual-panel code-panel">
-          <div class="code-shot">
-            <img src="assets/recovery-flow.png" alt="recovery flow screenshot">
+        <div class="visual-panel">
+          <div class="visual-title">错误恢复矩阵：先分类，再行动</div>
+          <div class="recovery-matrix">
+            <div class="recovery-card retry"><strong>可重试</strong><span>网络抖动、临时超时。动作：退避重试，限制次数。</span></div>
+            <div class="recovery-card"><strong>需改参数</strong><span>路径错误、命令参数错。动作：读错误摘要，修正后再跑。</span></div>
+            <div class="recovery-card ask"><strong>需用户输入</strong><span>缺凭证、权限确认、需求不清。动作：提出具体问题。</span></div>
+            <div class="recovery-card stop"><strong>不可恢复</strong><span>策略禁止、资源不存在、目标冲突。动作：停止并说明原因。</span></div>
           </div>
+          <p class="mini-text">失败信息要「可行动」，模型需要的是下一步线索，不是一整屏未经整理的报错。</p>
         </div>
       </div>
       <div class="footer"><span>好 Agent 不是不失败，而是会恢复</span><span>20</span></div>
@@ -2370,25 +2379,24 @@
         <div class="lesson-copy">
           <p class="source-note">Todo 管当前注意力，任务系统管跨会话、跨角色、可恢复的长期工作。</p>
           <div class="plain-points">
-            <div class="plain-point"><strong>要解决的问题：</strong>
-              不是单纯的TODO列表，而是一张“依赖关系图”。<br>
-如果没有专门的任务系统，agent 很容易出现这些问题：<br>
-前置工作没做完，就贸然开始后面的任务<br>
-某个任务完成以后，不知道解锁了谁<br>
-多个 agent 协作时，没有统一任务板可读<br>
-所以这一章要做的升级是：<br>
-把“会话里的 todo”升级成“可持久化的任务图”。</div>
+            <div class="plain-point"><strong>要解决的问题：</strong>复杂目标不是一轮对话能完成的，必须保存任务状态、依赖关系、负责人、产物和日志。</div>
             <div class="plain-point"><strong>核心机制：</strong>把大目标拆成 task graph；每个 task 有 pending、ready、running、blocked、done 等状态。</div>
-            <div class="plain-point analogy"><strong>可以这样理解：</strong>后端与设计同学，需等产品同学完成后才能开始。前端研发同学必须等设计同学完成，才能开始开发。测试同学必须等研发同学完成，才能开始测试。</div>
+            <div class="plain-point analogy"><strong>可以这样理解：</strong>任务系统像项目看板，不只是模型脑子里的计划，而是所有 Agent 都能读写的共同现实。</div>
+            <div class="plain-point"><strong>工程重点：</strong>状态变更要落盘；依赖解除后才能 ready；产物和日志要可追溯，方便中断后继续。</div>
           </div>
         </div>
         <div class="visual-panel">
-          <div class="visual-title">任务落到目录文件 .tasks/task_xxx.json </div>
-          <img class="screenshot" src="assets/task-manager.png" alt="task manager screenshot">
-          <p class="mini-text">最小工具集：task_create、task_update、task_get、task_list</p>
+          <div class="visual-title">任务图：长期工作的共同状态</div>
+          <div class="task-graph">
+            <div class="task-node done"><strong>task-01 需求澄清</strong><span>done · artifact: brief.md</span></div>
+            <div class="task-node ready"><strong>task-02 实现功能</strong><span>ready · owner: coder · depends on 01</span></div>
+            <div class="task-node blocked"><strong>task-03 联调验证</strong><span>blocked · 等待测试环境</span></div>
+            <div class="task-node"><strong>task-04 交付总结</strong><span>pending · depends on 02 + 03</span></div>
+          </div>
+          <p class="mini-text">任务系统把「下一步」从聊天上下文里拿出来，变成可恢复、可交接、可审计的状态。</p>
         </div>
       </div>
-      <div class="footer"><span>todo 更像本轮计划，task 更像长期工作板/span><span>21</span></div>
+      <div class="footer"><span>任务板是多轮工作的共同现实</span><span>21</span></div>
     </section>
 
     <section class="slide">
@@ -2406,7 +2414,23 @@
         </div>
         <div class="visual-panel">
           <div class="visual-title">后台执行流：快返回，慢执行，完成再通知</div>
-          <img class="screenshot" src="assets/background-manager.png" alt="background manager screenshot">
+          <div class="runtime-flow">
+            <div class="runtime-row">
+              <div class="runtime-box">主循环发起<span>run tests / build / crawl</span></div>
+              <div class="flow-arrow">→</div>
+              <div class="runtime-box keep">立即返回 task_id<span>主循环继续规划或处理别的事</span></div>
+            </div>
+            <div class="runtime-row">
+              <div class="runtime-box">后台执行槽<span>写完整日志和产物</span></div>
+              <div class="flow-arrow">→</div>
+              <div class="runtime-box keep">通知队列<span>done / failed / timeout 摘要</span></div>
+            </div>
+            <div class="runtime-row">
+              <div class="runtime-box keep">主循环读取通知<span>决定重试、修复或继续</span></div>
+              <div class="flow-arrow">→</div>
+              <div class="runtime-box">任务状态更新<span>running → done / blocked</span></div>
+            </div>
+          </div>
           <p class="mini-text">讲解重点：后台任务不是脱离系统单独跑，最终结果必须回到任务状态和上下文里。</p>
         </div>
       </div>
@@ -2458,27 +2482,31 @@
         <div class="lesson-copy">
           <p class="source-note">多 Agent 不是一次性 subagent，而是让不同角色长期存在、拥有职责和状态。</p>
           <div class="plain-points">
-            <div class="plain-point"><strong>要解决的问题：</strong>s04 的 subagent 已经能帮主 agent 拆小任务。但 subagent 有一个很明显的边界：创建 -> 执行 -> 返回摘要 -> 消失。这很适合一次性的小委派。
-<br>可如果你想做这些事，就不够用了：
-<br>让两个 agent 长期分工
-<br>让某个 agent 未来收到新任务后继续工作
-<br>也就是说，系统现在缺的不是“再开一个模型调用”，而是：一批有身份、能长期存在、能反复协作的队友。</div>
-            <div class="plain-point analogy"><strong>实现核心：</strong>
-              <p>1、先有一份队伍名册</p>
-              <p>2、spawn 一个持久队友</p>
-              <p>3、给每个队友一个邮箱，最简单的做法可以直接用 JSONL 文件</p>
-              <p>4、队友每轮先看邮箱，再继续工作</p>
-            </div>
+            <div class="plain-point"><strong>要解决的问题：</strong>一个 Agent 很难同时做好规划、探索、实现、测试和交付，还保持所有上下文都清晰。</div>
+            <div class="plain-point"><strong>核心机制：</strong>每个角色有自己的职责、工具范围、上下文、记忆和任务队列。</div>
+            <div class="plain-point analogy"><strong>可以这样理解：</strong>团队 Agent 像长期队友，不是临时函数调用；每个人知道自己负责什么，也知道怎么交接。</div>
+            <div class="plain-point"><strong>工程重点：</strong>角色边界要清楚，输入输出要结构化；否则团队只会增加沟通噪音。</div>
           </div>
         </div>
-
         <div class="visual-panel">
-          <div class="visual-title">团队系统至少需要“名册 + 邮箱 + 独立循环”</div>
-          <img class="screenshot" src="assets/24.png" alt="background manager screenshot">
-          <p class="mini-text">每个队友都应该有自己的 messages 和自己的 inbox。</p>
+          <div class="visual-title">Agent 团队：职责、工具、状态分开</div>
+          <div class="team-map">
+            <div class="team-lead">
+              <h3>Lead Agent</h3>
+              <div class="team-token">拆目标和优先级</div>
+              <div class="team-token">分派任务和验收</div>
+              <div class="team-token">整合最终交付</div>
+            </div>
+            <div class="team-member">
+              <h3>长期角色</h3>
+              <div class="team-token">Explorer：查资料、扫代码、找证据</div>
+              <div class="team-token">Coder：实现改动、维护 diff</div>
+              <div class="team-token">Tester：运行验证、复现失败</div>
+              <div class="team-token">Writer：整理说明、产出文档</div>
+            </div>
+          </div>
+          <p class="mini-text">讲解重点：团队化的价值不是「人多」，而是把不同上下文和工具边界隔离开。</p>
         </div>
-
-
       </div>
       <div class="footer"><span>队友不是一次性函数调用</span><span>24</span></div>
     </section>
@@ -2488,31 +2516,30 @@
       <h2>团队协议：协作要有可追踪规则</h2>
       <div class="lesson-layout">
         <div class="lesson-copy">
-          <p class="source-note">有了邮箱以后，团队已经能说话；有了协议以后，团队才开始会“按规矩协作”。</p>
+          <p class="source-note">多 Agent 要靠协议协作，而不是靠自然语言随口喊话。</p>
           <div class="plain-points">
-            <div class="plain-point"><strong>要解决的问题：</strong>s15 已经让队友之间可以互相发消息。
-
-但如果所有事情都只靠自由文本，会有两个明显问题：
-某些动作必须明确批准或拒绝，不能只靠一句模糊回复。<br>
-一旦多个请求同时存在，系统很难知道“这条回复对应哪一件事”
-最典型的两个场景就是：<br>
-队友要不要优雅关机<br>
-某个高风险计划要不要先审批</div>
-            <div class="plain-point"><strong>核心机制：</strong>任务认领、状态更新、消息、交接、退出都走结构化协议。双方提前约定好“消息长什么样、收到以后怎么处理”。
-
-</div>
+            <div class="plain-point"><strong>要解决的问题：</strong>多个 Agent 同时工作会抢任务、覆盖文件、丢交接、重复验证、互相不知道状态。</div>
+            <div class="plain-point"><strong>核心机制：</strong>任务认领、状态更新、消息、交接、退出都走结构化协议。</div>
             <div class="plain-point analogy"><strong>可以这样理解：</strong>协议像团队协作制度：谁认领、谁负责、什么时候交接，都要写到系统里。</div>
+            <div class="plain-point"><strong>工程重点：</strong>消息要能 ack；任务要能锁定；退出前要交接；领导可以请求停止，但不能直接抹掉执行者手上的状态。</div>
           </div>
         </div>
-
-
         <div class="visual-panel">
           <div class="visual-title">团队协议：把协作动作结构化</div>
-          <img class="screenshot" src="assets/24.png" alt="background manager screenshot">
+          <div class="protocol-map">
+            <div class="protocol-row">
+              <div class="protocol-cell track">Claim<span>原子认领 ready task</span></div>
+              <div class="protocol-cell">Update<span>running / blocked / done</span></div>
+              <div class="protocol-cell track">Ack<span>收到请求，确认责任</span></div>
+            </div>
+            <div class="protocol-row">
+              <div class="protocol-cell">Handoff<span>产物、风险、下一步</span></div>
+              <div class="protocol-cell track">Exit<span>先交接，再退出</span></div>
+              <div class="protocol-cell">Audit<span>消息、状态、产物留痕</span></div>
+            </div>
+          </div>
           <p class="mini-text">没有协议的多 Agent 只是多条聊天；有协议才是可追踪的协作系统。</p>
         </div>
-
-
       </div>
       <div class="footer"><span>多 Agent 需要协议，不只需要热闹</span><span>25</span></div>
     </section>
@@ -2532,11 +2559,16 @@
         </div>
         <div class="visual-panel">
           <div class="visual-title">自治循环：只在规则下主动找活</div>
-          <img class="screenshot" src="assets/26.png" alt="background manager screenshot">
-          <p class="mini-text">自治的边界来自任务系统和团队协议，不是让 Agent 无限自由发挥。</p>
+          <div class="autonomy-loop">
+            <div class="autonomy-step"><strong>IDLE</strong><span>没有当前任务，等待消息或任务板变化。</span></div>
+            <div class="autonomy-step"><strong>Check Inbox</strong><span>处理点名请求、交接消息、停止请求。</span></div>
+            <div class="autonomy-step claim"><strong>Claim Ready Task</strong><span>原子认领，写 owner 和 running 状态。</span></div>
+            <div class="autonomy-step"><strong>Work + Report</strong><span>执行、产出 artifact、更新任务状态。</span></div>
+            <div class="autonomy-step stop"><strong>No Ready Task</strong><span>继续 idle，不凭空扩展目标。</span></div>
+            <div class="autonomy-step"><strong>Back To Board</strong><span>完成后回到任务板找下一项。</span></div>
+          </div>
+          <p class="mini-text">讲解重点：自治的边界来自任务系统和团队协议，不是让 Agent 无限自由发挥。</p>
         </div>
-
-
       </div>
       <div class="footer"><span>自治是在规则下认领 ready task</span><span>26</span></div>
     </section>
@@ -2556,8 +2588,23 @@
         </div>
         <div class="visual-panel">
           <div class="visual-title">Worktree 车道：并行动手，集中汇总</div>
-                    <img class="screenshot" src="assets/27.png" alt="background manager screenshot">
-
+          <div class="worktree-lanes">
+            <div class="lane-row">
+              <div class="lane-cell">main<span>稳定基线</span></div>
+              <div class="lane-cell active">task-024 worktree<span>Coder 修改 UI</span></div>
+              <div class="lane-cell">task-025 worktree<span>Tester 补验证</span></div>
+            </div>
+            <div class="lane-row">
+              <div class="lane-cell">隔离修改<span>互不覆盖工作区</span></div>
+              <div class="lane-cell active">各自测试<span>本车道先跑通</span></div>
+              <div class="lane-cell active">提交产物<span>diff + logs + notes</span></div>
+            </div>
+            <div class="lane-row">
+              <div class="lane-cell">汇总口<span>主代理评审</span></div>
+              <div class="lane-cell">处理冲突<span>明确谁覆盖谁</span></div>
+              <div class="lane-cell active">合并回主线<span>最终测试和交付</span></div>
+            </div>
+          </div>
           <p class="mini-text">Worktree 降低冲突概率，但不能代替合并前的测试和代码审查。</p>
         </div>
       </div>
