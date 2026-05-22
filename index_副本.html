@@ -2618,17 +2618,16 @@
         <div class="lesson-copy">
           <p class="source-note">平台化以后，Agent 不应该为每个外部系统单独硬编码，而要通过 MCP / 插件标准化接入能力。</p>
           <div class="plain-points">
-            <div class="plain-point"><strong>要解决的问题：</strong>浏览器、数据库、Wiki、GitHub、内部系统、桌面应用都有不同协议和鉴权方式。</div>
+            <div class="plain-point"><strong>要解决的问题：</strong>能不能让外部程序也把工具接进来，而不用每次都改主程序</div>
             <div class="plain-point"><strong>核心机制：</strong>MCP / 插件把 resources、tools、prompts 统一暴露给 Agent，宿主负责注册和权限管理。</div>
             <div class="plain-point analogy"><strong>可以这样理解：</strong>MCP 像 Agent 的 USB-C 接口：外部系统各不相同，但接入形态尽量标准化。</div>
-            <div class="plain-point"><strong>工程重点：</strong>工具描述要清楚；权限最小化；敏感数据不随意传出；失败和速率限制要包装成可恢复结果。</div>
           </div>
         </div>
         <div class="visual-panel">
-          <div class="visual-title">MCP / 插件：外部能力接入层</div>
+          <div class="visual-title">MCP与插件：外部能力接入层</div>
           <div class="mcp-flow">
             <div class="mcp-row">
-              <div class="mcp-box">外部系统<span>Wiki / GitHub / DB / Browser</span></div>
+              <div class="mcp-box">外部系统<span>能不能让外部程序也把工具接进来，而不用每次都改主程序？</span></div>
               <div class="flow-arrow">→</div>
               <div class="mcp-box keep">MCP Server / Plugin<span>封装认证、协议、数据格式</span></div>
             </div>
