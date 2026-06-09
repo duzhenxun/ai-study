@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OMO / OMC / OMX 多智能体编排层分享</title>
+  <style>
+    :root {
+      --ink: #17212b;
+      --muted: #657385;
+      --paper: #fbf8f1;
+      --card: rgba(255, 255, 255, 0.74);
+      --line: rgba(23, 33, 43, 0.12);
+      --orange: #d45a2c;
+      --teal: #087c78;
+      --blue: #335c92;
+      --yellow: #efbd4d;
+      --green: #3e8b4d;
+      --shadow: 0 24px 80px rgba(23, 33, 43, 0.13);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at 8% 4%, rgba(212, 90, 44, 0.18), transparent 22%),
+        radial-gradient(circle at 92% 10%, rgba(8, 124, 120, 0.16), transparent 24%),
+        radial-gradient(circle at 50% 100%, rgba(239, 189, 77, 0.18), transparent 28%),
+        linear-gradient(135deg, #f5eadb 0%, #fbf8f1 44%, #edf6f3 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      content: "";
+      opacity: 0.48;
+      background-image:
+        linear-gradient(rgba(23, 33, 43, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 33, 43, 0.045) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, black, transparent 82%);
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 36px));
+      margin: 0 auto;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid rgba(23, 33, 43, 0.08);
+      background: rgba(251, 248, 241, 0.78);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 64px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .mark {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      color: white;
+      background: linear-gradient(135deg, var(--orange), var(--teal));
+      box-shadow: 0 10px 30px rgba(212, 90, 44, 0.24);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .nav-links a:hover {
+      color: var(--ink);
+      background: rgba(23, 33, 43, 0.06);
+    }
+
+    .hero {
+      min-height: calc(100vh - 64px);
+      display: grid;
+      align-items: center;
+      padding: 58px 0 36px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.03fr) minmax(360px, 0.76fr);
+      gap: 36px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 16px;
+      color: var(--orange);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      max-width: 10.5em;
+      font-size: clamp(42px, 7vw, 92px);
+      line-height: 0.98;
+      letter-spacing: -0.045em;
+    }
+
+    h2 {
+      font-size: clamp(32px, 4vw, 58px);
+      line-height: 1.06;
+      letter-spacing: -0.035em;
+    }
+
+    h3 {
+      font-size: 21px;
+      line-height: 1.2;
+    }
+
+    .lead {
+      max-width: 42em;
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: clamp(20px, 2.1vw, 30px);
+      line-height: 1.52;
+    }
+
+    .hero strong,
+    .section-title strong {
+      color: var(--orange);
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid rgba(23, 33, 43, 0.12);
+      border-radius: 8px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.62);
+      font-size: 14px;
+      font-weight: 850;
+      text-decoration: none;
+      box-shadow: 0 10px 30px rgba(23, 33, 43, 0.08);
+    }
+
+    .button.primary {
+      border-color: transparent;
+      color: white;
+      background: linear-gradient(135deg, var(--orange), #b44724);
+    }
+
+    .system-map {
+      position: relative;
+      min-height: 540px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.48)),
+        radial-gradient(circle at 80% 10%, rgba(8, 124, 120, 0.12), transparent 44%);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .orbit {
+      position: absolute;
+      border: 1px dashed rgba(23, 33, 43, 0.14);
+      border-radius: 999px;
+      inset: 62px 36px 72px;
+    }
+
+    .orbit.second {
+      inset: 122px 90px 130px;
+    }
+
+    .commander {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      display: grid;
+      place-items: center;
+      width: 180px;
+      height: 180px;
+      padding: 20px;
+      border-radius: 50%;
+      color: white;
+      text-align: center;
+      transform: translate(-50%, -50%);
+      background:
+        radial-gradient(circle at 34% 24%, rgba(255, 255, 255, 0.26), transparent 28%),
+        linear-gradient(135deg, #17212b, #2a455f);
+      box-shadow: 0 24px 70px rgba(23, 33, 43, 0.26);
+    }
+
+    .commander b {
+      display: block;
+      font-size: 28px;
+      line-height: 1.1;
+    }
+
+    .commander span {
+      display: block;
+      margin-top: 8px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .agent-dot {
+      position: absolute;
+      width: 134px;
+      min-height: 92px;
+      padding: 14px;
+      border: 1px solid rgba(23, 33, 43, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 16px 45px rgba(23, 33, 43, 0.1);
+    }
+
+    .agent-dot b {
+      display: block;
+      font-size: 17px;
+      line-height: 1.15;
+    }
+
+    .agent-dot span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .agent-dot:nth-of-type(4) { left: 26px; top: 68px; border-top: 4px solid var(--orange); }
+    .agent-dot:nth-of-type(5) { right: 30px; top: 54px; border-top: 4px solid var(--teal); }
+    .agent-dot:nth-of-type(6) { left: 58px; bottom: 74px; border-top: 4px solid var(--blue); }
+    .agent-dot:nth-of-type(7) { right: 54px; bottom: 68px; border-top: 4px solid var(--green); }
+    .agent-dot:nth-of-type(8) { left: 50%; top: 22px; transform: translateX(-50%); border-top: 4px solid var(--yellow); }
+
+    section {
+      padding: 76px 0;
+    }
+
+    .section-title {
+      display: grid;
+      grid-template-columns: minmax(0, 0.82fr) minmax(280px, 0.52fr);
+      gap: 28px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    .section-title p {
+      color: var(--muted);
+      font-size: 19px;
+      line-height: 1.6;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--card);
+      box-shadow: 0 18px 52px rgba(23, 33, 43, 0.08);
+    }
+
+    .card p,
+    .card li {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.58;
+    }
+
+    .card h3 + p,
+    .card h3 + ul {
+      margin-top: 12px;
+    }
+
+    ul,
+    ol {
+      margin: 0;
+      padding-left: 1.2em;
+    }
+
+    li + li {
+      margin-top: 7px;
+    }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .role {
+      min-height: 154px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .role small {
+      display: inline-flex;
+      margin-bottom: 14px;
+      padding: 5px 8px;
+      border-radius: 6px;
+      color: white;
+      background: var(--blue);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .role:nth-child(1) small { background: var(--orange); }
+    .role:nth-child(2) small { background: var(--teal); }
+    .role:nth-child(3) small { background: var(--blue); }
+    .role:nth-child(4) small { background: var(--green); }
+
+    .role b {
+      display: block;
+      font-size: 20px;
+    }
+
+    .role span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      counter-reset: step;
+    }
+
+    .step {
+      position: relative;
+      min-height: 242px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 18px 52px rgba(23, 33, 43, 0.08);
+      counter-increment: step;
+    }
+
+    .step::before {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      margin-bottom: 22px;
+      border-radius: 8px;
+      color: white;
+      background: linear-gradient(135deg, var(--orange), var(--teal));
+      font-size: 17px;
+      font-weight: 900;
+      content: counter(step);
+    }
+
+    .step p {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .code-line {
+      display: block;
+      width: 100%;
+      margin-top: 14px;
+      padding: 10px 12px;
+      border: 1px solid rgba(23, 33, 43, 0.1);
+      border-radius: 8px;
+      color: #f7efe2;
+      background: #17212b;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      overflow-x: auto;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 0.88fr) minmax(360px, 0.58fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+    }
+
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .timeline-row b {
+      color: var(--orange);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .timeline-row p {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.54;
+    }
+
+    .comparison-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: var(--shadow);
+    }
+
+    .comparison {
+      width: 100%;
+      min-width: 920px;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .comparison th,
+    .comparison td {
+      width: 25%;
+      padding: 20px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .comparison th:last-child,
+    .comparison td:last-child {
+      border-right: 0;
+    }
+
+    .comparison tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .comparison th {
+      color: white;
+      background: #17212b;
+      font-weight: 900;
+    }
+
+    .comparison b {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .comparison p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.52;
+    }
+
+    .comparison th p {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .callout {
+      padding: 30px;
+      border-radius: 8px;
+      color: white;
+      background:
+        radial-gradient(circle at 88% 18%, rgba(239, 189, 77, 0.22), transparent 26%),
+        linear-gradient(135deg, #17212b, #274761);
+      box-shadow: var(--shadow);
+    }
+
+    .callout p {
+      margin-top: 12px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .choice {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .choice .card {
+      min-height: 188px;
+    }
+
+    footer {
+      padding: 34px 0 52px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 520ms ease, transform 520ms ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .section-title,
+      .split {
+        grid-template-columns: 1fr;
+      }
+
+      .system-map {
+        min-height: 500px;
+      }
+
+      .cards,
+      .flow,
+      .role-grid,
+      .choice {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .comparison {
+        min-width: 860px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .shell {
+        width: min(100% - 28px, 1180px);
+      }
+
+      .nav-inner {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 14px 0;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        min-height: auto;
+        padding-top: 44px;
+      }
+
+      .hero-grid {
+        gap: 24px;
+      }
+
+      .system-map {
+        min-height: 620px;
+        padding: 18px;
+      }
+
+      .orbit {
+        display: none;
+      }
+
+      .commander {
+        position: relative;
+        left: auto;
+        top: auto;
+        width: 100%;
+        height: auto;
+        min-height: 126px;
+        border-radius: 8px;
+        transform: none;
+      }
+
+      .agent-dot {
+        position: relative;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        bottom: auto !important;
+        width: 100%;
+        margin-top: 10px;
+        transform: none !important;
+      }
+
+      section {
+        padding: 52px 0;
+      }
+
+      .cards,
+      .flow,
+      .role-grid,
+      .choice {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="shell nav-inner">
+      <div class="brand"><span class="mark">AI</span> OMO / OMC / OMX 多智能体编排</div>
+      <div class="nav-links">
+        <a href="#architecture">架构</a>
+        <a href="#spawn">动态 Spawn</a>
+        <a href="#implementation">实现关键</a>
+        <a href="#compare">三方对比</a>
+        <a href="#choice">怎么选</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <div class="shell hero-grid">
+        <div class="reveal">
+          <p class="eyebrow">From Single Agent To AI Team</p>
+          <h1>把编码 CLI 升级成<strong>多智能体团队模式</strong></h1>
+          <p class="lead">OMO、OMC、OMX 都是在现有编码工具之上加一套编排层：主 Agent 常驻做总指挥，遇到专业任务就动态生成独立子 Agent，并行、异步、隔离地完成工作，结束后自动回收。</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#spawn">看 Spawn 流程</a>
+            <a class="button" href="#compare">看 OMC / OMO / OMX 对比</a>
+          </div>
+        </div>
+        <div class="system-map reveal" aria-label="多智能体架构图">
+          <div class="orbit"></div>
+          <div class="orbit second"></div>
+          <div class="commander">
+            <div>
+              <b>Main Agent</b>
+              <span>Sisyphus / AGENTS.md<br />理解需求 / 拆任务 / 派活 / 汇总</span>
+            </div>
+          </div>
+          <div class="agent-dot"><b>Prometheus</b><span>规划层：访谈、拆解、路线图</span></div>
+          <div class="agent-dot"><b>Oracle</b><span>专家层：架构评审、技术判断</span></div>
+          <div class="agent-dot"><b>Librarian</b><span>查文档、读长文本、找依据</span></div>
+          <div class="agent-dot"><b>Engineer</b><span>执行层：真正写代码和改页面</span></div>
+          <div class="agent-dot"><b>Explore</b><span>快速扫代码、定位上下文</span></div>
+        </div>
+      </div>
+    </header>
+
+    <section id="architecture">
+      <div class="shell">
+        <div class="section-title reveal">
+          <div>
+            <p class="eyebrow">01 / Architecture</p>
+            <h2>主 Agent 是总指挥，<strong>不是搬砖工</strong></h2>
+          </div>
+          <p>OMO / OMC 里常见的主控是 Sisyphus；OMX 则把 Codex CLI 通过 AGENTS.md、prompts、skills 和 team 命令组织成主控入口。它们共同负责理解、拆解、调度、验收和持续推进 TODO。</p>
+        </div>
+        <div class="role-grid">
+          <div class="role reveal"><small>编排层</small><b>Sisyphus / Codex 主控</b><span>常驻或入口式主 Agent，判断任务类型，决定该派谁上，负责最终整合。</span></div>
+          <div class="role reveal"><small>规划层</small><b>Prometheus / Metis / Momus</b><span>做需求澄清、计划生成、找缺口、审计划。</span></div>
+          <div class="role reveal"><small>专家层</small><b>Oracle / Librarian / Explore</b><span>处理架构、文档、代码探索等高专业度或高上下文任务。</span></div>
+          <div class="role reveal"><small>执行层</small><b>Worker / Frontend / Tester</b><span>真正改代码、写页面、补测试、产出可合并结果。</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="spawn">
+      <div class="shell">
+        <div class="section-title reveal">
+          <div>
+            <p class="eyebrow">02 / Dynamic Spawn</p>
+            <h2>子 Agent 自动起来，核心是<strong>四步闭环</strong></h2>
+          </div>
+          <p>从用户的一句话，到多个后台 Agent 并行跑完，这类工具依赖的是意图识别、动态生成、隔离执行、结果回调这一整条链路。OMX 的入口更偏 Codex CLI：常用 $team、$ralph 或 omx team 来触发团队化执行。</p>
+        </div>
+        <div class="flow">
+          <div class="step reveal">
+            <h3>意图识别</h3>
+            <p>Sisyphus 先过 IntentGate：查文档给 Librarian，架构评审给 Oracle，写前端给 Frontend Engineer。</p>
+          </div>
+          <div class="step reveal">
+            <h3>动态生成</h3>
+            <p>调用内部 Agent 生成接口，创建独立会话、独立上下文、专属模型和最小必要上下文。</p>
+            <code class="code-line">/subagents spawn oracle · omx team</code>
+          </div>
+          <div class="step reveal">
+            <h3>独立执行</h3>
+            <p>子 Agent 使用自己的模型和工具链运行，主 Agent 不被阻塞，可以继续调度其他任务。</p>
+          </div>
+          <div class="step reveal">
+            <h3>回调回收</h3>
+            <p>完成后返回代码、文档或结论。Sisyphus 校验整合，子 Agent 自动销毁或休眠。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="implementation">
+      <div class="shell">
+        <div class="section-title reveal">
+          <div>
+            <p class="eyebrow">03 / Why It Works</p>
+            <h2>能跑起来，靠的是<strong>隔离、路由、Hook 和工具链</strong></h2>
+          </div>
+          <p>表面看是“叫几个 Agent 干活”，底层实际是会话、上下文、模型、工具权限和生命周期管理的组合。</p>
+        </div>
+        <div class="cards">
+          <div class="card reveal">
+            <h3>异步非阻塞</h3>
+            <ul>
+              <li>后台异步任务调度</li>
+              <li>独立会话或运行时状态管理</li>
+              <li>多个子 Agent 同时跑，主 Agent 继续推进</li>
+            </ul>
+          </div>
+          <div class="card reveal">
+            <h3>三级上下文</h3>
+            <ul>
+              <li>项目规则：AGENTS.md</li>
+              <li>主/子 Agent 会话上下文隔离</li>
+              <li>子任务临时上下文或 .omx/ 运行态，用完即清</li>
+            </ul>
+          </div>
+          <div class="card reveal">
+            <h3>多模型路由</h3>
+            <ul>
+              <li>Sisyphus：强推理主脑</li>
+              <li>Oracle：逻辑和架构</li>
+              <li>Librarian：文档和长文本</li>
+              <li>Explore：快速扫代码</li>
+            </ul>
+          </div>
+          <div class="card reveal">
+            <h3>生命周期 Hook</h3>
+            <p>任务前、任务中、任务后都能插入自定义逻辑，比如权限检查、日志、验收、格式化、通知。</p>
+          </div>
+          <div class="card reveal">
+            <h3>MCP 工具链</h3>
+            <p>内置 MCP、项目 .mcp.json、Skill 内嵌工具三层组合，子 Agent 按需拿工具，不把工具堆给所有人。</p>
+          </div>
+          <div class="card reveal">
+            <h3>用完即散</h3>
+            <p>子 Agent 不常驻。结果回传后释放资源，只保留主 Agent 的稳定上下文和最终结论。</p>
+          </div>
+          <div class="card reveal">
+            <h3>OMX 运行时</h3>
+            <p>OMX 参考实现里还有 .omx/ 状态目录、HUD、prompts、skills 和 hooks，用来把 Codex CLI 包成可编排团队。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="shell split">
+        <div>
+          <div class="section-title reveal" style="grid-template-columns: 1fr; margin-bottom: 18px;">
+            <div>
+              <p class="eyebrow">04 / Example</p>
+              <h2>例子：给 Next.js 加登录认证</h2>
+            </div>
+          </div>
+          <div class="timeline">
+            <div class="timeline-row reveal"><b>Input</b><p>用户输入：ulw / ultrapilot / omx team 给 Next.js 加登录认证。</p></div>
+            <div class="timeline-row reveal"><b>Route</b><p>主 Agent 判断需要需求澄清、架构、前端、后端和测试。</p></div>
+            <div class="timeline-row reveal"><b>Plan</b><p>Prometheus 访谈和查代码，Oracle 评审方案并选择技术栈。</p></div>
+            <div class="timeline-row reveal"><b>Build</b><p>Frontend Engineer 写登录页，后端 Agent 写 API、JWT 和数据库逻辑。</p></div>
+            <div class="timeline-row reveal"><b>Verify</b><p>Tester 写单元测试和集成测试，多个 Agent 并行后台跑。</p></div>
+            <div class="timeline-row reveal"><b>Finish</b><p>主 Agent 汇总代码、解决冲突、收尾，子 Agent 全部回收。</p></div>
+          </div>
+        </div>
+        <div class="callout reveal">
+          <h2>一句话总结</h2>
+          <p>OMO、OMC、OMX 都是在把单人编码助手升级成“AI 团队模式”：主 Agent 当老板，动态召唤各路专家子 Agent 并行干活，干完就散，高效又省钱。</p>
+          <code class="code-line">ulw / ultrapilot / omx team</code>
+        </div>
+      </div>
+    </section>
+
+    <section id="compare">
+      <div class="shell">
+        <div class="section-title reveal">
+          <div>
+            <p class="eyebrow">05 / OMC vs OMO vs OMX</p>
+            <h2>三者都是<strong>同一类编排层</strong>，底座不同</h2>
+          </div>
+          <p>你关心的多 Agent 机制高度相似：主 Agent、动态子 Agent 团队、并行执行、多模型路由、skills、MCP、hooks。区别主要在适配 OpenCode、Claude Code 还是 OpenAI Codex CLI。</p>
+        </div>
+        <div class="comparison-wrap reveal">
+          <table class="comparison">
+            <thead>
+              <tr>
+                <th><b>维度</b><p>看哪里不一样</p></th>
+                <th><b>Oh My OpenCode</b><p>OMO</p></th>
+                <th><b>Oh My Claude Code</b><p>OMC</p></th>
+                <th><b>Oh My Codex</b><p>OMX</p></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>底层底座</b><p>运行在哪个编码工具上。</p></td>
+                <td><b>OpenCode</b><p>更贴合 OpenCode 的 LSP、终端、文件操作和开放模型生态。</p></td>
+                <td><b>Claude Code</b><p>原生适配 Claude Code 体验，也可接入其他模型。</p></td>
+                <td><b>OpenAI Codex CLI</b><p>把 Codex CLI 包成团队化工作流，重点是 team、prompts、skills 和 .omx 运行态。</p></td>
+              </tr>
+              <tr>
+                <td><b>主 Agent</b><p>谁常驻当总指挥。</p></td>
+                <td><b>Sisyphus</b><p>理解需求、拆任务、派活、汇总和收尾。</p></td>
+                <td><b>Sisyphus</b><p>同一套主控逻辑，同样不亲自干脏活累活。</p></td>
+                <td><b>AGENTS.md + 命令入口</b><p>通过 Codex 项目规则、Slash command、prompts 和 team flow 组织主控行为。</p></td>
+              </tr>
+              <tr>
+                <td><b>动态子 Agent</b><p>是否能自动拉起团队。</p></td>
+                <td><b>支持</b><p>ulw 触发多 Agent 并行执行，独立会话，完成后回收。</p></td>
+                <td><b>支持</b><p>ultrapilot 触发多 Agent 并行执行，隔离上下文。</p></td>
+                <td><b>支持</b><p>$team、$ralph 或 omx team 触发团队模式，面向 Codex CLI 的编排。</p></td>
+              </tr>
+              <tr>
+                <td><b>特色细节</b><p>生态层面的微差。</p></td>
+                <td><b>OpenCode 工具链</b><p>更好对接 OpenCode 专属能力。</p></td>
+                <td><b>记忆文件系统</b><p>常见 SOUL.md、MEMORY.md 等长期记忆文件。</p></td>
+                <td><b>Codex-first 运行时</b><p>.omx/ 状态、HUD、hooks、skills、MCP 和 README.zh.md 里的可安装流程。</p></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="choice">
+      <div class="shell">
+        <div class="section-title reveal">
+          <div>
+            <p class="eyebrow">06 / Decision</p>
+            <h2>怎么选？看你平时用什么</h2>
+          </div>
+          <p>核心体验都是“主 Agent + 动态子 Agent 团队”。选择时不用纠结架构差异，优先跟随你当前的日常工具栈。</p>
+        </div>
+        <div class="choice">
+          <div class="card reveal">
+            <h3>你用 OpenCode</h3>
+            <p>装 Oh My OpenCode。它原生贴合 OpenCode 的终端、文件、LSP 和开放模型生态。</p>
+          </div>
+          <div class="card reveal">
+            <h3>你用 Claude Code</h3>
+            <p>装 Oh My Claude Code。它对 Claude Code 的交互和记忆体系更顺手。</p>
+          </div>
+          <div class="card reveal">
+            <h3>你用 Codex CLI</h3>
+            <p>看 Oh My Codex。它把 AGENTS.md、prompts、skills、MCP、hooks 和 team 命令整合到 Codex 工作流里。</p>
+          </div>
+          <div class="card reveal">
+            <h3>多个都用</h3>
+            <p>随便从最常用的入口开始。多 Agent 编排的核心体验一致，迁移成本主要在命令名和工具链细节。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">OMO / OMC / OMX Multi-Agent Orchestration Share Page</div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      }
+    }, { threshold: 0.14 });
+
+    document.querySelectorAll(".reveal").forEach((item) => observer.observe(item));
+  </script>
+</body>
+</html>

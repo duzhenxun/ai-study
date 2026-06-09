@@ -1,0 +1,1175 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>程序员如何真正使用 AI Agent 工作</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172026;
+      --muted: #60717d;
+      --line: #d7e0e5;
+      --paper: #f7faf9;
+      --panel: #ffffff;
+      --green: #19755b;
+      --green-soft: #e4f3ec;
+      --blue: #255f95;
+      --blue-soft: #e7f0fa;
+      --red: #b84b45;
+      --red-soft: #fae9e7;
+      --amber: #a56612;
+      --amber-soft: #fbefd9;
+      --shadow: 0 20px 45px rgba(31, 58, 71, 0.12);
+      --radius: 8px;
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.7;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    code {
+      padding: 1px 5px;
+      border: 1px solid #d7e0e5;
+      border-radius: 5px;
+      background: #f0f5f4;
+      color: #27454c;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.92em;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 28px 22px;
+      border-right: 1px solid var(--line);
+      background: #eef5f2;
+      overflow: auto;
+    }
+
+    .brand {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 26px;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 2px solid var(--green);
+      border-radius: 8px;
+      color: var(--green);
+      font-weight: 800;
+      background: #fff;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.24;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    nav a {
+      display: block;
+      padding: 9px 10px;
+      border-radius: 6px;
+      color: #344650;
+      font-size: 14px;
+    }
+
+    nav a:hover {
+      background: #dfece7;
+      text-decoration: none;
+    }
+
+    .side-note {
+      margin-top: 26px;
+      padding: 14px;
+      border: 1px solid #c7d7d1;
+      border-radius: var(--radius);
+      background: #fff;
+      font-size: 13px;
+      color: #43535b;
+    }
+
+    main {
+      padding: 34px clamp(18px, 4vw, 58px) 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: clamp(18px, 4vw, 42px);
+      align-items: center;
+      min-height: calc(100vh - 68px);
+      padding-bottom: 24px;
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 22px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 9px;
+      border: 1px solid #c6d8d2;
+      border-radius: 999px;
+      background: #fff;
+      color: #35614f;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    h2,
+    h3 {
+      letter-spacing: 0;
+      line-height: 1.25;
+    }
+
+    .hero h2 {
+      margin: 0;
+      max-width: 820px;
+      font-size: clamp(36px, 5.7vw, 72px);
+      line-height: 1.04;
+    }
+
+    .hero .lead {
+      margin: 0;
+      max-width: 760px;
+      color: #3d4f59;
+      font-size: clamp(17px, 2vw, 22px);
+    }
+
+    .rule-line {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 760px;
+    }
+
+    .rule-tile {
+      min-height: 112px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 12px 28px rgba(49, 83, 95, 0.08);
+    }
+
+    .rule-tile strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .rule-tile span {
+      display: block;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .workspace-visual {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #ffffff;
+      box-shadow: var(--shadow);
+    }
+
+    .visual-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dots i {
+      display: block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #cad5db;
+    }
+
+    .visual-body {
+      display: grid;
+      gap: 14px;
+      padding-top: 18px;
+    }
+
+    .code-card,
+    .agent-card {
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid #d8e1e6;
+      background: #101a22;
+      color: #d7e6ed;
+      font-family: "SFMono-Regular", Consolas, monospace;
+    }
+
+    .agent-card {
+      background: #f7fbfa;
+      color: var(--ink);
+      font-family: inherit;
+    }
+
+    .code-card header,
+    .agent-card header {
+      padding: 9px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 12px;
+      color: #9cb0bd;
+    }
+
+    .agent-card header {
+      border-bottom-color: #dfe7eb;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    pre {
+      margin: 0;
+      padding: 14px;
+      overflow: auto;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .agent-list {
+      display: grid;
+      gap: 9px;
+      padding: 14px;
+      margin: 0;
+      list-style: none;
+    }
+
+    .agent-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: #31434d;
+      font-size: 14px;
+    }
+
+    .agent-list b {
+      color: var(--green);
+    }
+
+    section {
+      margin-top: 38px;
+      scroll-margin-top: 20px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 38px);
+    }
+
+    .section-head p {
+      max-width: 640px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .panel,
+    .decision-box,
+    .quote-box {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 12px 30px rgba(31, 58, 71, 0.08);
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .panel h3 {
+      margin: 0 0 8px;
+      font-size: 19px;
+    }
+
+    .panel p,
+    .panel li {
+      color: #43535b;
+      font-size: 15px;
+    }
+
+    .panel p {
+      margin: 0;
+    }
+
+    .panel ul {
+      margin: 12px 0 0;
+      padding-left: 20px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-height: 28px;
+      margin-bottom: 12px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .tag.green {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .tag.blue {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .tag.amber {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .tag.red {
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    .decision-box {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+      gap: 0;
+      overflow: hidden;
+    }
+
+    .decision-inputs {
+      padding: 20px;
+      border-right: 1px solid var(--line);
+      background: #fbfdfc;
+    }
+
+    .decision-inputs h3,
+    .decision-result h3 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+
+    .checks {
+      display: grid;
+      gap: 10px;
+    }
+
+    label.check {
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      padding: 11px 10px;
+      border: 1px solid #dce5e9;
+      border-radius: 7px;
+      background: #fff;
+      cursor: pointer;
+      color: #344650;
+      font-size: 14px;
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--green);
+      margin-top: 3px;
+    }
+
+    .decision-result {
+      display: grid;
+      align-content: center;
+      gap: 14px;
+      min-height: 340px;
+      padding: 24px;
+      background: linear-gradient(135deg, #ffffff 0%, #f3f8f6 100%);
+    }
+
+    .verdict {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      min-height: 42px;
+      padding: 5px 13px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: var(--green);
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .decision-result p {
+      margin: 0;
+      color: #3b4d56;
+      font-size: 17px;
+    }
+
+    .mini-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .mini-list li {
+      padding-left: 18px;
+      position: relative;
+      color: #526570;
+      font-size: 14px;
+    }
+
+    .mini-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 11px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: 0 12px 30px rgba(31, 58, 71, 0.08);
+    }
+
+    th,
+    td {
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      background: #edf5f2;
+      color: #2f4f44;
+      font-weight: 900;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .yes {
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .no {
+      color: #b5bec3;
+      font-weight: 900;
+    }
+
+    .flow {
+      display: grid;
+      gap: 12px;
+    }
+
+    .flow-step {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .flow-step b {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 18px;
+    }
+
+    .flow-step h3 {
+      margin: 0 0 4px;
+      font-size: 18px;
+    }
+
+    .flow-step p {
+      margin: 0;
+      color: #526570;
+      font-size: 15px;
+    }
+
+    .prompt {
+      border: 1px solid #d6e0e6;
+      border-radius: var(--radius);
+      background: #111b22;
+      color: #dceaf0;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .prompt header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      color: #a9bcc8;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .quote-box {
+      padding: 20px;
+      border-left: 5px solid var(--green);
+    }
+
+    .quote-box p {
+      margin: 0;
+      color: #354853;
+      font-size: clamp(18px, 2.2vw, 25px);
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .source-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .source-list li {
+      color: #43535b;
+      font-size: 14px;
+    }
+
+    .footer {
+      margin-top: 44px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 980px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        position: static;
+        height: auto;
+        padding: 18px;
+      }
+
+      nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .side-note {
+        display: none;
+      }
+
+      .hero,
+      .decision-box,
+      .grid,
+      .grid.two {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+
+      .decision-inputs {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+    }
+
+    @media (max-width: 640px) {
+      main {
+        padding: 24px 14px 44px;
+      }
+
+      nav {
+        grid-template-columns: 1fr;
+      }
+
+      .rule-line {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        display: grid;
+      }
+
+      th,
+      td {
+        padding: 10px 9px;
+        font-size: 13px;
+      }
+
+      .workspace-visual {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="brand">
+        <div class="brand-mark">AI</div>
+        <h1>程序员如何真正使用 Agent 工作</h1>
+        <p>少一点 Prompt Driven Development，多一点工程判断。</p>
+      </div>
+      <nav aria-label="页面导航">
+        <a href="#principle">核心原则</a>
+        <a href="#decider">使用判断器</a>
+        <a href="#modes">三种协作模式</a>
+        <a href="#workflow">标准工作流</a>
+        <a href="#prompt">Prompt 模板</a>
+        <a href="#review">验证与 Review</a>
+        <a href="#team">团队落地</a>
+        <a href="#sources">参考资料</a>
+      </nav>
+      <div class="side-note">
+        <strong>一句话版：</strong><br>
+        2 秒能改完的，不要问 AI；2 小时才能摸清的，优先交给 Agent。
+      </div>
+    </aside>
+
+    <main>
+      <section class="hero" id="top">
+        <div class="hero-copy">
+          <span class="eyebrow">Agentic Coding 工作手册</span>
+          <h2>AI Coding 不是少写所有代码，而是减少低价值编码。</h2>
+          <p class="lead">成熟的工程师不会把每一次敲键盘都外包给 Agent。真正高效的方式是：人负责判断、边界和验收，Agent 负责搜索、批量执行、重构、测试和跨文件落地。</p>
+          <div class="rule-line" aria-label="核心规则">
+            <div class="rule-tile">
+              <strong>2秒</strong>
+              <span>已定位、已知道 diff：自己改。</span>
+            </div>
+            <div class="rule-tile">
+              <strong>20分</strong>
+              <span>需要查影响面：让 Agent 先研究。</span>
+            </div>
+            <div class="rule-tile">
+              <strong>2小时+</strong>
+              <span>跨模块、重复劳动：让 Agent 主导。</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="workspace-visual" aria-label="程序员与 Agent 协作示意">
+          <div class="visual-top">
+            <span>human + agent workspace</span>
+            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          </div>
+          <div class="visual-body">
+            <div class="code-card">
+              <header>你已经知道怎么改</header>
+              <pre>if user.Level &gt; 5 {
+    return allowJoin(activity)
+}
+
+// 这种改动：自己敲一个 =</pre>
+            </div>
+            <div class="agent-card">
+              <header>Agent 更适合处理</header>
+              <ul class="agent-list">
+                <li><b>01</b> 找到活动报名失败的真实链路</li>
+                <li><b>02</b> 把会员体系升级影响面列出来</li>
+                <li><b>03</b> 给 50 个接口统一补日志与测试</li>
+                <li><b>04</b> 拆分 2000 行函数并保留行为</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="principle">
+        <div class="section-head">
+          <h2>核心原则</h2>
+          <p>判断“谁来改”的关键不是技术炫技，而是谁拥有最高密度的上下文。</p>
+        </div>
+        <div class="quote-box">
+          <p>谁最清楚，就谁来改。Agent 的价值不是替你按每一个键，而是替你承担搜索、展开、重复和验证。</p>
+        </div>
+        <div class="grid" style="margin-top:14px">
+          <article class="panel">
+            <span class="tag green">自己改</span>
+            <h3>你知道文件、函数和 diff</h3>
+            <p>比如 <code>&gt;</code> 改 <code>&gt;=</code>、文案替换、参数调整、SQL 条件微调。让 Agent 接手反而要消耗定位、解释和确认成本。</p>
+          </article>
+          <article class="panel">
+            <span class="tag blue">Agent 改</span>
+            <h3>你知道目标，但不知道路径</h3>
+            <p>比如“报名失败为什么发生”“新增支付渠道要改哪些层”。让 Agent 先读代码、列影响面、给计划，再决定是否执行。</p>
+          </article>
+          <article class="panel">
+            <span class="tag amber">人 Review</span>
+            <h3>Agent 产出必须验收</h3>
+            <p>OpenAI 和 GitHub 都强调：Agent 可以运行测试、提交 PR、展示日志，但人仍要审查和验证生成代码后再合入。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="decider">
+        <div class="section-head">
+          <h2>使用判断器</h2>
+          <p>勾选当前任务的特征，快速判断该自己动手、与 Agent 结对，还是把任务委派给 Agent。</p>
+        </div>
+
+        <div class="decision-box">
+          <div class="decision-inputs">
+            <h3>任务特征</h3>
+            <div class="checks">
+              <label class="check"><input type="checkbox" data-score="-3">我已经知道具体文件、函数和修改内容</label>
+              <label class="check"><input type="checkbox" data-score="-2">改动少于 5 行，且不需要全局搜索</label>
+              <label class="check"><input type="checkbox" data-score="2">我不知道问题在哪里，需要先定位</label>
+              <label class="check"><input type="checkbox" data-score="3">涉及 3 个以上模块或多端联动</label>
+              <label class="check"><input type="checkbox" data-score="2">需要批量修改、补测试、补日志或迁移接口</label>
+              <label class="check"><input type="checkbox" data-score="2">需要理解陌生代码、调用链或历史设计</label>
+              <label class="check"><input type="checkbox" data-score="1">需要先产出方案、风险点和验收清单</label>
+            </div>
+          </div>
+          <div class="decision-result" aria-live="polite">
+            <span class="verdict" id="verdict">自己改</span>
+            <h3 id="verdictTitle">这是低成本手工改动</h3>
+            <p id="verdictText">你已经有准确上下文，直接在编辑器里改最快。不要把 10 秒工作变成 5 分钟对话。</p>
+            <ul class="mini-list" id="verdictList">
+              <li>改完后跑相关测试或至少做一次本地检查。</li>
+              <li>如果改动开始扩散，再切换为 Agent 研究模式。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="modes">
+        <div class="section-head">
+          <h2>三种协作模式</h2>
+          <p>不要只有“全交给 AI”和“完全不用 AI”两个档位。高效团队会按任务复杂度切换模式。</p>
+        </div>
+        <div class="grid">
+          <article class="panel">
+            <span class="tag green">Mode 1</span>
+            <h3>手工微改</h3>
+            <p>适合已定位的小改动。工程师直接修改，然后用 Agent 做可选的局部 Review 或测试建议。</p>
+            <ul>
+              <li>if 条件、参数、文案、配置</li>
+              <li>单点 SQL 条件</li>
+              <li>小范围样式或类型修复</li>
+            </ul>
+          </article>
+          <article class="panel">
+            <span class="tag blue">Mode 2</span>
+            <h3>结对探索</h3>
+            <p>适合你知道问题，但还不确定影响面。先让 Agent 只读研究，输出位置、调用链、风险和建议，不急着改。</p>
+            <ul>
+              <li>线上问题定位</li>
+              <li>陌生模块理解</li>
+              <li>改动前影响面分析</li>
+            </ul>
+          </article>
+          <article class="panel">
+            <span class="tag amber">Mode 3</span>
+            <h3>委派交付</h3>
+            <p>适合跨文件、重复劳动或完整功能。Agent 负责实现和自测，人负责验收标准、产品判断、安全边界和最终 Review。</p>
+            <ul>
+              <li>新增支付渠道、报表、后台能力</li>
+              <li>批量日志、测试、迁移</li>
+              <li>大函数拆分和系统性重构</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="matrix">
+        <div class="section-head">
+          <h2>决策表</h2>
+          <p>可以直接贴进团队 Wiki，当作 Code Agent 使用规范的第一版。</p>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>场景</th>
+              <th>自己改</th>
+              <th>Agent 改</th>
+              <th>建议</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1 行代码、5 行以内、文案或配置</td>
+              <td class="yes">√</td>
+              <td class="no">-</td>
+              <td>直接改。必要时让 Agent 帮你看是否漏测试。</td>
+            </tr>
+            <tr>
+              <td>已定位问题，已知道函数和修改方案</td>
+              <td class="yes">√</td>
+              <td class="no">-</td>
+              <td>不要写 Prompt 绕路。改完跑最小验证。</td>
+            </tr>
+            <tr>
+              <td>不知道问题在哪，代码库很大</td>
+              <td class="no">-</td>
+              <td class="yes">√</td>
+              <td>先让 Agent 只做调查，输出证据和候选原因。</td>
+            </tr>
+            <tr>
+              <td>跨 Controller、Service、Dao、前端联动</td>
+              <td class="no">-</td>
+              <td class="yes">√</td>
+              <td>让 Agent 先列影响面和计划，再执行。</td>
+            </tr>
+            <tr>
+              <td>50 个接口统一加日志、鉴权或错误码</td>
+              <td class="no">-</td>
+              <td class="yes">√</td>
+              <td>Agent 适合重复但要有规则的机械劳动。</td>
+            </tr>
+            <tr>
+              <td>重构、拆大函数、补测试</td>
+              <td>视情况</td>
+              <td class="yes">√</td>
+              <td>给现有行为、测试目标和禁止改动范围。</td>
+            </tr>
+            <tr>
+              <td>安全、支付、权限、数据删除</td>
+              <td>谨慎</td>
+              <td>谨慎</td>
+              <td>Agent 可辅助，但必须人工设计、审查和灰度验证。</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="workflow">
+        <div class="section-head">
+          <h2>标准工作流</h2>
+          <p>Agent 不是“许愿机”。把任务拆成研究、计划、实现、验证、Review，结果会稳定很多。</p>
+        </div>
+        <div class="flow">
+          <div class="flow-step">
+            <b>1</b>
+            <div>
+              <h3>先写清楚任务边界</h3>
+              <p>说明目标、业务背景、不能改什么、验收标准。GitHub 建议给 Agent 的 issue 要足够清晰且范围适中。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <b>2</b>
+            <div>
+              <h3>先研究，不急着写代码</h3>
+              <p>对于不熟的区域，让 Agent 先定位文件、画调用链、列风险。GitHub 的最佳实践也建议先研究、计划、迭代，再开 PR。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <b>3</b>
+            <div>
+              <h3>给它明确靶子</h3>
+              <p>Anthropic 的经验是：Agent 在有清晰目标时表现更好，例如失败测试、视觉稿、接口契约或明确输出。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <b>4</b>
+            <div>
+              <h3>让 Agent 自己验证</h3>
+              <p>要求它运行相关测试、lint、类型检查，并把失败点说清楚。OpenAI 对 Codex 的说明也强调用户应能查看引用、终端日志和测试结果。</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <b>5</b>
+            <div>
+              <h3>人做最终 Review</h3>
+              <p>Agent 写的代码必须像普通同事提交的 PR 一样审查：看行为、测试、安全、可维护性和是否改了不该改的地方。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="prompt">
+        <div class="section-head">
+          <h2>Prompt 模板</h2>
+          <p>真正有用的 Prompt 不是“帮我改一下”，而是把工程任务交代完整。</p>
+        </div>
+        <div class="grid two">
+          <div class="prompt">
+            <header><span>研究模式</span><span>只读，不改代码</span></header>
+            <pre>请先不要修改代码。
+
+目标：定位活动报名失败的原因。
+已知现象：等级为 5 的用户报名失败，等级 6 可以。
+范围：活动报名链路，不要分析无关营销模块。
+
+请输出：
+1. 相关文件和函数
+2. 调用链
+3. 最可能的 2 个原因
+4. 你建议修改的位置
+5. 需要补充的测试用例</pre>
+          </div>
+          <div class="prompt">
+            <header><span>实现模式</span><span>小步修改，可验证</span></header>
+            <pre>请按下面方案实现，并保持改动最小。
+
+目标：等级 5 及以上用户可以报名活动。
+修改范围：活动报名逻辑和相关测试。
+禁止：不要改会员等级模型，不要重构无关代码。
+
+验收：
+1. Level 4 不可报名
+2. Level 5 可以报名
+3. Level 6 可以报名
+4. 运行相关单元测试并汇报结果</pre>
+          </div>
+        </div>
+      </section>
+
+      <section id="review">
+        <div class="section-head">
+          <h2>验证与 Review</h2>
+          <p>Agent 做得越多，人越不能只看“它说完成了”。你要看证据。</p>
+        </div>
+        <div class="grid">
+          <article class="panel">
+            <span class="tag blue">看 diff</span>
+            <h3>是否改了正确的位置</h3>
+            <p>重点看是否出现“绕路式修复”：改了调用方、加了奇怪兜底、扩大了权限或改了不相关模块。</p>
+          </article>
+          <article class="panel">
+            <span class="tag green">看测试</span>
+            <h3>是否覆盖边界条件</h3>
+            <p>对 bugfix，至少要有失败用例变绿；对重构，要有行为保持的测试或人工验证路径。</p>
+          </article>
+          <article class="panel">
+            <span class="tag red">看风险</span>
+            <h3>是否碰到安全和数据</h3>
+            <p>权限、支付、隐私、删除、迁移、密钥和依赖升级，不能只依赖 Agent 自信输出。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="team">
+        <div class="section-head">
+          <h2>团队落地建议</h2>
+          <p>把 Agent 用好，最终是团队工程习惯问题，不是某个工具的 Prompt 技巧。</p>
+        </div>
+        <div class="grid two">
+          <article class="panel">
+            <h3>建立“任务分流”共识</h3>
+            <p>把小改、中改、大改的例子写进团队规范。Review 时也可以提醒：这个改动你自己 10 秒能完成，不必开 Agent 会话。</p>
+            <ul>
+              <li>小改自己来</li>
+              <li>不确定先让 Agent 研究</li>
+              <li>跨文件和重复劳动让 Agent 执行</li>
+            </ul>
+          </article>
+          <article class="panel">
+            <h3>给仓库写 Agent 说明</h3>
+            <p>维护构建命令、测试命令、目录结构、代码风格、禁改区域和 Review 重点。GitHub 和 Codex 类工具都支持通过仓库说明提升 Agent 对项目的理解。</p>
+            <ul>
+              <li>如何启动和测试</li>
+              <li>模块边界和命名约定</li>
+              <li>安全、权限、数据库变更规则</li>
+            </ul>
+          </article>
+          <article class="panel">
+            <h3>让 Agent 并行做低耦合任务</h3>
+            <p>OpenAI 的团队实践提到，Codex 常用于理解复杂系统、重构大代码库、处理新功能和紧急问题。适合拆成多个互不干扰的小任务并行推进。</p>
+          </article>
+          <article class="panel">
+            <h3>保留人的产品判断</h3>
+            <p>Agent 很会完成“说清楚的任务”，但不天然理解业务取舍。需求是否正确、风险能否接受、上线节奏如何，仍然是工程师和团队负责。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="anti-pattern">
+        <div class="section-head">
+          <h2>避免误区</h2>
+          <p>Prompt Driven Development 最大的问题，不是用了 Prompt，而是把清楚的工程判断换成了低效对话。</p>
+        </div>
+        <div class="grid">
+          <article class="panel">
+            <span class="tag red">误区</span>
+            <h3>已定位还让 Agent 搜全项目</h3>
+            <p>这会放大误改概率，也会浪费上下文窗口。直接告诉它文件和行，或自己改。</p>
+          </article>
+          <article class="panel">
+            <span class="tag red">误区</span>
+            <h3>一句“优化一下”就开工</h3>
+            <p>没有目标、验收和边界，Agent 只能猜。猜对是运气，猜错是常态。</p>
+          </article>
+          <article class="panel">
+            <span class="tag red">误区</span>
+            <h3>只看总结，不看证据</h3>
+            <p>不要因为 Agent 写了“已完成”就合入。看 diff、日志、测试、风险说明。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="sources">
+        <div class="section-head">
+          <h2>参考资料</h2>
+          <p>本页结合了工程实践经验，以及 Claude Code、GitHub Copilot coding agent、OpenAI Codex 的官方资料。</p>
+        </div>
+        <ul class="source-list">
+          <li><a href="https://www.anthropic.com/engineering/claude-code-best-practices" target="_blank" rel="noreferrer">Anthropic Engineering: Claude Code best practices</a></li>
+          <li><a href="https://code.claude.com/docs/en/best-practices" target="_blank" rel="noreferrer">Claude Code Docs: Best practices for Claude Code</a></li>
+          <li><a href="https://docs.github.com/en/copilot/how-tos/agents/copilot-coding-agent/best-practices-for-using-copilot-to-work-on-tasks" target="_blank" rel="noreferrer">GitHub Docs: Best practices for using Copilot to work on tasks</a></li>
+          <li><a href="https://docs.github.com/en/copilot/concepts/about-copilot-coding-agent" target="_blank" rel="noreferrer">GitHub Docs: About GitHub Copilot coding agent</a></li>
+          <li><a href="https://openai.com/business/guides-and-resources/how-openai-uses-codex/" target="_blank" rel="noreferrer">OpenAI: How OpenAI uses Codex</a></li>
+          <li><a href="https://openai.com/index/introducing-codex/" target="_blank" rel="noreferrer">OpenAI: Introducing Codex</a></li>
+        </ul>
+      </section>
+
+      <div class="footer">
+        版本：2026-06-09。建议把本页作为团队讨论稿，结合你们自己的代码库、发布流程和事故复盘继续细化。
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const inputs = [...document.querySelectorAll("input[type='checkbox'][data-score]")];
+    const verdict = document.getElementById("verdict");
+    const title = document.getElementById("verdictTitle");
+    const text = document.getElementById("verdictText");
+    const list = document.getElementById("verdictList");
+
+    const states = {
+      manual: {
+        label: "自己改",
+        title: "这是低成本手工改动",
+        text: "你已经有准确上下文，直接在编辑器里改最快。不要把 10 秒工作变成 5 分钟对话。",
+        points: ["改完后跑相关测试或至少做一次本地检查。", "如果改动开始扩散，再切换为 Agent 研究模式。"],
+        color: "green"
+      },
+      pair: {
+        label: "先让 Agent 研究",
+        title: "适合结对探索，不要马上改",
+        text: "你需要 Agent 帮你补上下文。先要求它只读分析，输出证据、影响面、风险和计划。",
+        points: ["要求 Agent 列出文件、函数、调用链和不确定点。", "确认计划后，再决定自己改还是让 Agent 改。"],
+        color: "blue"
+      },
+      delegate: {
+        label: "委派给 Agent",
+        title: "适合 Agent 主导执行",
+        text: "任务有明显的搜索、批量、跨文件或验证成本。给清楚目标、边界和验收标准，让 Agent 实现并自测。",
+        points: ["让 Agent 小步提交，保留可读 diff。", "最终必须人工 Review，特别是权限、支付、数据和依赖。"],
+        color: "amber"
+      }
+    };
+
+    function render() {
+      const score = inputs.reduce((sum, input) => sum + (input.checked ? Number(input.dataset.score) : 0), 0);
+      const checkedCount = inputs.filter(input => input.checked).length;
+      const picked = checkedCount === 0 || score <= -2 ? states.manual : score <= 3 ? states.pair : states.delegate;
+      verdict.textContent = picked.label;
+      title.textContent = picked.title;
+      text.textContent = picked.text;
+      verdict.style.background = picked.color === "green" ? "var(--green-soft)" : picked.color === "blue" ? "var(--blue-soft)" : "var(--amber-soft)";
+      verdict.style.color = picked.color === "green" ? "var(--green)" : picked.color === "blue" ? "var(--blue)" : "var(--amber)";
+      list.innerHTML = picked.points.map(point => `<li>${point}</li>`).join("");
+    }
+
+    inputs.forEach(input => input.addEventListener("change", render));
+    render();
+  </script>
+</body>
+</html>
