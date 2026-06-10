@@ -635,6 +635,120 @@
       font-size: 14px;
     }
 
+    .case-brief {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .case-card {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: 0 12px 30px rgba(31, 58, 71, 0.08);
+    }
+
+    .case-card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .case-card p {
+      margin: 0;
+      color: #43535b;
+      font-size: 15px;
+    }
+
+    .case-card ul {
+      display: grid;
+      gap: 8px;
+      margin: 12px 0 0;
+      padding-left: 20px;
+      color: #43535b;
+      font-size: 15px;
+    }
+
+    .handoff-table td:first-child {
+      width: 138px;
+      font-weight: 800;
+      color: #2d444d;
+    }
+
+    .case-timeline {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .case-step {
+      display: grid;
+      grid-template-columns: 118px minmax(0, 1fr);
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .case-time {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .case-time span {
+      display: inline-flex;
+      width: fit-content;
+      min-height: 28px;
+      align-items: center;
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .case-step h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .case-step p {
+      margin: 0 0 10px;
+      color: #43535b;
+      font-size: 15px;
+    }
+
+    .case-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .case-action {
+      padding: 12px;
+      border-radius: 7px;
+      background: #f6faf8;
+      border: 1px solid #dbe6e1;
+    }
+
+    .case-action strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #2f4f44;
+      font-size: 14px;
+    }
+
+    .case-action span {
+      display: block;
+      color: #526570;
+      font-size: 14px;
+    }
+
     .footer {
       margin-top: 44px;
       padding-top: 24px;
@@ -664,6 +778,7 @@
 
       .hero,
       .decision-box,
+      .case-brief,
       .grid,
       .grid.two {
         grid-template-columns: 1fr;
@@ -705,6 +820,11 @@
       .workspace-visual {
         padding: 10px;
       }
+
+      .case-step,
+      .case-actions {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -723,6 +843,7 @@
         <a href="#workflow">标准工作流</a>
         <a href="#prompt">Prompt 模板</a>
         <a href="#review">验证与 Review</a>
+        <a href="#case">真实案例</a>
         <a href="#team">团队落地</a>
         <a href="#sources">参考资料</a>
       </nav>
@@ -1042,6 +1163,212 @@
             <h3>是否碰到安全和数据</h3>
             <p>权限、支付、隐私、删除、迁移、密钥和依赖升级，不能只依赖 Agent 自信输出。</p>
           </article>
+        </div>
+      </section>
+
+      <section id="case">
+        <div class="section-head">
+          <h2>真实案例：从需求改动到上线</h2>
+          <p>下面用一个常见业务改动串完整流程：什么时候自己改，什么时候让 AI 研究、实现、补测试和准备上线材料。</p>
+        </div>
+
+        <div class="case-brief">
+          <article class="case-card">
+            <span class="tag amber">业务背景</span>
+            <h3>活动报名等级规则调整</h3>
+            <p>运营反馈：原规则是“用户等级大于 5 才能报名活动”，现在活动策略改为“用户等级大于等于 5 即可报名”。表面看只是 <code>&gt;</code> 改成 <code>&gt;=</code>，但它可能同时影响活动详情页、报名接口、后台配置、风控提示、测试用例和上线验证。</p>
+          </article>
+          <article class="case-card">
+            <span class="tag blue">目标</span>
+            <h3>不是让 AI 代替你改等号</h3>
+            <p>如果你已经知道就在 <code>JoinActivity()</code> 里改一行，那就自己改。但在真实项目里，程序员更常面对的是：规则散落在哪里、是否有前端文案、是否有缓存、是否有测试、上线后怎么证明生效。AI 的价值就在这些环节。</p>
+            <ul>
+              <li>人负责判断业务语义、风险和上线决策。</li>
+              <li>AI 负责读代码库、找影响面、补测试、生成检查清单。</li>
+              <li>小 diff 人直接改，大范围改动让 AI 执行，人 Review。</li>
+            </ul>
+          </article>
+        </div>
+
+        <table class="handoff-table">
+          <thead>
+            <tr>
+              <th>阶段</th>
+              <th>人主导</th>
+              <th>AI 辅助</th>
+              <th>输出物</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>需求澄清</td>
+              <td>确认“等级 5 可报名”的业务含义、活动范围、是否只影响新活动。</td>
+              <td>把需求改写成验收标准、列边界问题。</td>
+              <td>验收清单：Level 4 拒绝，Level 5/6 通过。</td>
+            </tr>
+            <tr>
+              <td>影响面分析</td>
+              <td>判断哪些模块是核心链路，哪些不能乱改。</td>
+              <td>搜索报名链路、等级判断、错误文案、测试和后台配置。</td>
+              <td>文件列表、调用链、风险点。</td>
+            </tr>
+            <tr>
+              <td>代码修改</td>
+              <td>如果只是一行已定位代码，自己改。</td>
+              <td>如果散落多处，让 AI 按计划小步修改。</td>
+              <td>最小 diff，不做无关重构。</td>
+            </tr>
+            <tr>
+              <td>测试验证</td>
+              <td>判断测试是否覆盖真实业务边界。</td>
+              <td>补单测、接口用例、回归清单，运行测试并解释失败。</td>
+              <td>测试日志、失败修复、手工验证步骤。</td>
+            </tr>
+            <tr>
+              <td>上线准备</td>
+              <td>决定灰度范围、回滚策略、是否通知运营和客服。</td>
+              <td>生成 PR 描述、发布说明、上线检查表、监控关注项。</td>
+              <td>PR、发布单、回滚说明。</td>
+            </tr>
+            <tr>
+              <td>上线后</td>
+              <td>确认指标正常，判断是否扩大灰度或全量。</td>
+              <td>整理日志查询语句、监控项、复盘记录。</td>
+              <td>上线验证截图、监控结果、经验沉淀。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="case-timeline">
+          <div class="case-step">
+            <div class="case-time">第 0 步<span>接需求</span></div>
+            <div>
+              <h3>先把一句需求变成可验收规则</h3>
+              <p>不要直接开改。先确认“等级 5”是用户当前等级、历史最高等级，还是活动报名时冻结的等级；确认老活动是否受影响。</p>
+              <div class="case-actions">
+                <div class="case-action">
+                  <strong>人做</strong>
+                  <span>问产品和运营：范围、边界、上线时间、失败提示是否要变。</span>
+                </div>
+                <div class="case-action">
+                  <strong>AI 做</strong>
+                  <span>把需求整理成验收标准和待确认问题，避免漏问。</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="case-step">
+            <div class="case-time">第 1 步<span>查影响面</span></div>
+            <div>
+              <h3>不知道散落在哪，就让 AI 先只读研究</h3>
+              <p>真实项目里同一个规则可能出现在服务端校验、前端按钮置灰、错误码文案、后台预览、数据报表里。此时不要靠记忆硬改。</p>
+              <div class="case-actions">
+                <div class="case-action">
+                  <strong>人做</strong>
+                  <span>告诉 AI 搜索范围：活动报名链路优先，营销报表暂不改。</span>
+                </div>
+                <div class="case-action">
+                  <strong>AI 做</strong>
+                  <span>搜索 <code>Level &gt; 5</code>、报名错误码、活动测试，输出调用链和候选修改点。</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="case-step">
+            <div class="case-time">第 2 步<span>决定谁改</span></div>
+            <div>
+              <h3>已定位的一行，自己改；多文件一致性，让 AI 改</h3>
+              <p>如果 AI 研究后发现只有一个函数判断错了，程序员直接敲 <code>=</code>。如果同时要改接口测试、前端提示、后台预览，就让 AI 按清单执行。</p>
+              <div class="case-actions">
+                <div class="case-action">
+                  <strong>人做</strong>
+                  <span>选择策略：手改核心一行，或让 AI 批量同步相关文件。</span>
+                </div>
+                <div class="case-action">
+                  <strong>AI 做</strong>
+                  <span>按“最小改动”原则修改，不顺手重构、不扩大会员体系设计。</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="case-step">
+            <div class="case-time">第 3 步<span>补测试</span></div>
+            <div>
+              <h3>测试用 AI 很划算，因为边界样例重复但重要</h3>
+              <p>这个需求至少要覆盖 Level 4、5、6。若有活动开关、库存、报名时间，还要保证新规则没有掩盖其他失败原因。</p>
+              <div class="case-actions">
+                <div class="case-action">
+                  <strong>人做</strong>
+                  <span>确认哪些业务边界必须测，哪些只是已有用例复用。</span>
+                </div>
+                <div class="case-action">
+                  <strong>AI 做</strong>
+                  <span>补单测和接口测试，运行相关命令，失败时先解释原因再修。</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="case-step">
+            <div class="case-time">第 4 步<span>提 PR</span></div>
+            <div>
+              <h3>让 AI 写材料，人检查结论</h3>
+              <p>PR 描述、风险点、测试结果、上线影响、回滚方式都适合让 AI 起草。程序员要检查它有没有夸大覆盖范围，或者漏掉手工验证。</p>
+              <div class="case-actions">
+                <div class="case-action">
+                  <strong>人做</strong>
+                  <span>Review diff：是否只改活动报名，是否出现无关重构。</span>
+                </div>
+                <div class="case-action">
+                  <strong>AI 做</strong>
+                  <span>生成 PR 摘要、测试证据、发布说明和 Reviewer 关注点。</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="case-step">
+            <div class="case-time">第 5 步<span>灰度上线</span></div>
+            <div>
+              <h3>上线不是“代码合了就结束”</h3>
+              <p>先用内部账号或小流量验证 Level 5 可报名，同时观察 Level 4 拦截是否正常、报名失败率是否异常、客服反馈是否变少。</p>
+              <div class="case-actions">
+                <div class="case-action">
+                  <strong>人做</strong>
+                  <span>决定灰度比例、上线窗口、回滚触发条件。</span>
+                </div>
+                <div class="case-action">
+                  <strong>AI 做</strong>
+                  <span>准备验证步骤、日志查询语句、监控看板说明和回滚清单。</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="case-step">
+            <div class="case-time">第 6 步<span>复盘沉淀</span></div>
+            <div>
+              <h3>把这次经验变成下一次 Agent 更懂项目的上下文</h3>
+              <p>如果发现等级规则散落多处，就补团队规范：等级判断统一走一个函数；如果发现测试缺边界，就补测试模板。</p>
+              <div class="case-actions">
+                <div class="case-action">
+                  <strong>人做</strong>
+                  <span>决定是否抽公共能力、补规范、补监控。</span>
+                </div>
+                <div class="case-action">
+                  <strong>AI 做</strong>
+                  <span>整理复盘、生成代码库 Agent 说明、提出下次可自动化的检查项。</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="quote-box" style="margin-top:14px">
+          <p>这条链路里的关键不是“让 AI 改不改等号”，而是让程序员知道：需求澄清、影响面分析、测试、发布和复盘，每一步都有不同的人机分工。</p>
         </div>
       </section>
 
