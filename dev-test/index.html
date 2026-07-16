@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>从一次活动测试到一个可复用 Skill</title>
+  <style>
+    :root {
+      --ink: #171319;
+      --ivory: #f5f0e8;
+      --paper: #fffcf7;
+      --red: #b52e25;
+      --ember: #e8652e;
+      --gold: #d5a642;
+      --green: #16845b;
+      --muted: #756b6c;
+      --line: #d8cfc5;
+      --display: "Songti SC", STSong, serif;
+      --body: "PingFang SC", "Hiragino Sans GB", sans-serif;
+      --mono: SFMono-Regular, Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+    body { font-family: var(--body); color: var(--ink); }
+    deck-stage > section:not(.active) { display: none !important; }
+    deck-stage > section { width: 1920px; height: 1080px; overflow: hidden; background: var(--ivory); }
+    .slide { position: relative; width: 100%; height: 100%; padding: 84px 104px 76px; overflow: hidden; }
+    .slide.dark { background: var(--ink); color: var(--paper); }
+    .slide.red { background: var(--red); color: var(--paper); }
+    .slide.paper { background: var(--paper); }
+    .topline { position: absolute; top: 42px; left: 104px; right: 104px; display: flex; align-items: center; justify-content: space-between; font-size: 22px; color: var(--muted); }
+    .dark .topline, .red .topline { color: rgba(255,255,255,.62); }
+    .brand { display: flex; align-items: center; gap: 14px; font-weight: 650; }
+    .brand img { width: 38px; height: 38px; object-fit: cover; border-radius: 5px; }
+    .page-mark { font-family: var(--mono); }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2 { font-family: var(--display); font-weight: 800; text-wrap: balance; }
+    h1 { font-size: 118px; line-height: 1.06; }
+    h2 { font-size: 76px; line-height: 1.12; }
+    h3 { font-size: 38px; line-height: 1.25; }
+    p, li { font-size: 30px; line-height: 1.6; }
+    .kicker { color: var(--red); font-size: 24px; font-weight: 760; margin-bottom: 22px; }
+    .dark .kicker, .red .kicker { color: var(--gold); }
+    .lede { font-size: 38px; line-height: 1.55; color: var(--muted); max-width: 1260px; }
+    .dark .lede, .red .lede { color: rgba(255,255,255,.76); }
+    .accent { color: var(--red); }
+    .gold { color: var(--gold); }
+    .green { color: var(--green); }
+    .mono { font-family: var(--mono); }
+    .footer { position: absolute; bottom: 35px; left: 104px; right: 104px; display: flex; justify-content: space-between; color: var(--muted); font-size: 20px; }
+    .dark .footer, .red .footer { color: rgba(255,255,255,.55); }
+    .rule { width: 100%; height: 2px; background: var(--line); margin: 30px 0; }
+    .dark .rule, .red .rule { background: rgba(255,255,255,.18); }
+    .split { display: grid; grid-template-columns: 1.08fr .92fr; gap: 72px; align-items: center; height: 100%; }
+    .split.equal { grid-template-columns: 1fr 1fr; }
+    .stack { display: flex; flex-direction: column; gap: 24px; }
+    .metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; margin-top: 50px; }
+    .metric { padding: 26px 28px; border-top: 4px solid var(--red); background: rgba(255,255,255,.56); }
+    .dark .metric { background: rgba(255,255,255,.06); border-color: var(--gold); }
+    .metric strong { display: block; font-family: var(--display); font-size: 66px; line-height: 1; margin-bottom: 10px; }
+    .metric span { font-size: 24px; color: var(--muted); }
+    .dark .metric span { color: rgba(255,255,255,.65); }
+    .phone-shot { position: relative; height: 760px; overflow: hidden; border: 2px solid rgba(255,255,255,.28); box-shadow: 18px 22px 0 rgba(0,0,0,.18); }
+    .phone-shot img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+    .phone-shot.tall img { object-position: center 22%; }
+    .caption { margin-top: 14px; font-size: 22px; color: var(--muted); }
+    .dark .caption { color: rgba(255,255,255,.58); }
+    .choice-list { margin: 36px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 36px; }
+    .choice-list li { border-top: 2px solid var(--line); padding: 17px 0; font-size: 29px; }
+    .choice-list b { color: var(--red); font-family: var(--mono); margin-right: 12px; }
+    .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-top: 58px; align-items: stretch; }
+    .flow-step { position: relative; padding: 28px 22px 24px; border-top: 4px solid var(--red); background: var(--paper); min-height: 170px; }
+    .flow-step:not(:last-child)::after { content: "→"; position: absolute; right: -25px; top: 62px; color: var(--red); font-size: 36px; z-index: 2; }
+    .flow-step small { display: block; font-family: var(--mono); color: var(--red); font-size: 20px; margin-bottom: 12px; }
+    .flow-step strong { font-size: 30px; line-height: 1.35; }
+    .timeline { margin-top: 48px; position: relative; }
+    .timeline::before { content: ""; position: absolute; left: 42px; top: 8px; bottom: 8px; width: 3px; background: var(--gold); }
+    .event { position: relative; display: grid; grid-template-columns: 84px 1fr; gap: 22px; padding: 0 0 30px; }
+    .event .dot { width: 24px; height: 24px; border-radius: 50%; background: var(--gold); margin: 8px 0 0 31px; box-shadow: 0 0 0 8px rgba(213,166,66,.14); }
+    .event strong { font-family: var(--mono); font-size: 26px; color: var(--gold); }
+    .event p { font-size: 30px; color: rgba(255,255,255,.83); }
+    .code-panel { background: #0e0d10; color: #f8efe6; padding: 30px 34px; font-family: var(--mono); font-size: 24px; line-height: 1.65; border-top: 4px solid var(--gold); }
+    .code-panel .bad { color: #ff7c68; }
+    .code-panel .ok { color: #75d8a6; }
+    .code-panel .dim { color: #a99fa1; }
+    .evidence-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 42px; height: 525px; }
+    .evidence { overflow: hidden; background: #221820; border-bottom: 5px solid var(--gold); }
+    .evidence img { width: 100%; height: 100%; object-fit: cover; object-position: center 18%; }
+    .evidence.record img { object-position: center; }
+    .evidence-label { position: absolute; }
+    .quote { font-family: var(--display); font-size: 78px; line-height: 1.28; max-width: 1450px; }
+    .quote small { display: block; font-family: var(--body); font-size: 26px; margin-top: 26px; color: rgba(255,255,255,.62); }
+    .iterations { margin-top: 44px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 58px; }
+    .iteration { display: grid; grid-template-columns: 52px 1fr; gap: 18px; padding: 18px 0; border-top: 1px solid rgba(255,255,255,.18); }
+    .iteration b { font-family: var(--mono); color: var(--gold); font-size: 24px; }
+    .iteration p { font-size: 28px; color: rgba(255,255,255,.84); }
+    .compare { display: grid; grid-template-columns: 1fr 130px 1fr; align-items: center; gap: 26px; margin-top: 54px; }
+    .compare-col { min-height: 500px; padding: 40px; border-top: 5px solid var(--line); background: rgba(255,255,255,.58); }
+    .compare-col.after { border-color: var(--red); background: var(--paper); }
+    .compare-col h3 { margin-bottom: 28px; }
+    .compare-col ul { margin: 0; padding-left: 26px; }
+    .compare-col li { font-size: 28px; margin: 14px 0; }
+    .compare-arrow { text-align: center; color: var(--red); font-size: 80px; }
+    .pipeline { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 22px; margin-top: 42px; height: 600px; }
+    .pipe-item { position: relative; padding: 30px; border-top: 4px solid var(--gold); background: rgba(255,255,255,.065); }
+    .pipe-item b { display: block; font-family: var(--mono); color: var(--gold); font-size: 22px; margin-bottom: 14px; }
+    .pipe-item strong { font-size: 32px; line-height: 1.35; }
+    .pipe-item p { font-size: 24px; color: rgba(255,255,255,.65); margin-top: 13px; }
+    .matrix { width: 100%; border-collapse: collapse; margin-top: 34px; }
+    .matrix th, .matrix td { text-align: left; border-bottom: 1px solid var(--line); padding: 18px 16px; font-size: 25px; vertical-align: top; }
+    .matrix th { color: var(--red); font-family: var(--mono); font-size: 21px; }
+    .matrix td:first-child { font-weight: 760; }
+    .final-command { margin-top: 46px; border-top: 4px solid var(--gold); padding-top: 28px; font-family: var(--mono); font-size: 35px; line-height: 1.55; }
+    .takeaways { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px 60px; margin-top: 52px; }
+    .takeaway { border-top: 3px solid var(--gold); padding-top: 20px; }
+    .takeaway b { display: block; color: var(--gold); font-family: var(--mono); font-size: 22px; margin-bottom: 12px; }
+    .takeaway p { font-size: 30px; color: rgba(255,255,255,.84); }
+    .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 18%; filter: saturate(.92) contrast(1.05); }
+    .hero-shade { position: absolute; inset: 0; background: rgba(18,8,14,.66); }
+    .hero-content { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; padding-bottom: 80px; max-width: 1420px; }
+    .hero-content .eyebrow { font-family: var(--mono); font-size: 25px; color: var(--gold); margin-bottom: 26px; }
+    .hero-content h1 { color: white; font-size: 132px; }
+    .hero-content p { margin-top: 30px; color: rgba(255,255,255,.76); font-size: 36px; }
+    @media print {
+      deck-stage > section { display: block !important; page-break-after: always; }
+    }
+  </style>
+</head>
+<body>
+  <deck-stage>
+    <section data-screen-label="01 封面">
+      <div class="slide">
+        <img class="hero-bg" src="assets/h5-hero.jpg" alt="投壶祈福活动页面">
+        <div class="hero-shade"></div>
+        <div class="hero-content">
+          <div class="eyebrow">WEEKLY SHARE · ACTIVITY QA AUTOMATION</div>
+          <h1>从一次活动测试<br>到一个可复用 Skill</h1>
+          <p>投壶祈福 · TestQA 自动化测试实践与方法沉淀</p>
+        </div>
+        <div class="footer" style="z-index:3;color:rgba(255,255,255,.65)"><span>映客活动研发 · 周会分享</span><span>2026.07</span></div>
+      </div>
+    </section>
+
+    <section data-screen-label="02 起点">
+      <div class="slide paper">
+        <div class="topline"><div class="brand"><img src="assets/inke-logo.jpg" alt="映客"><span>活动自动化测试实践</span></div><span class="page-mark">02 / 09</span></div>
+        <div class="split equal" style="padding-top:40px">
+          <div>
+            <div class="kicker">THE STARTING POINT</div>
+            <h2>第一步不是点页面，<br>而是先问：<span class="accent">想证明什么？</span></h2>
+            <p class="lede" style="margin-top:30px">同一个活动，“快速可用”“完整回归”“奖池专项”“沉淀框架”需要完全不同的测试深度和数据成本。</p>
+          </div>
+          <div>
+            <ul class="choice-list">
+              <li><b>01</b>核心冒烟</li>
+              <li><b>02</b>完整回归</li>
+              <li><b>03</b>专项能力验证</li>
+              <li><b>04</b>可复用框架</li>
+              <li style="grid-column:1 / -1"><b>05</b>其他可验证目标</li>
+            </ul>
+            <div class="rule"></div>
+            <p style="font-size:27px;color:var(--muted)">本次最初选择：<strong class="accent">核心冒烟</strong>。目标是用最小 mutation 证明页面、兑换、互动、记录链路可用。</p>
+          </div>
+        </div>
+        <div class="footer"><span>先锁目标，再决定范围与证据</span><span>Goal gate</span></div>
+      </div>
+    </section>
+
+    <section data-screen-label="03 第一次执行">
+      <div class="slide">
+        <div class="topline"><div class="brand"><img src="assets/inke-logo.jpg" alt="映客"><span>第一次核心冒烟</span></div><span class="page-mark">03 / 09</span></div>
+        <div style="padding-top:48px">
+          <div class="kicker">FIRST EXECUTION</div>
+          <h2>用一条最小链路，拿到第一批真实证据</h2>
+          <div class="flow">
+            <div class="flow-step"><small>STEP 01</small><strong>页面加载<br>核心控件可见</strong></div>
+            <div class="flow-step"><small>STEP 02</small><strong>读取用户态<br>金币 / 券 / 资格</strong></div>
+            <div class="flow-step"><small>STEP 03</small><strong>必要时最小兑换<br>前后状态对比</strong></div>
+            <div class="flow-step"><small>STEP 04</small><strong>执行一次<br>最低成本主动作</strong></div>
+            <div class="flow-step"><small>STEP 05</small><strong>读取结果面<br>记录 / 广播 / 状态</strong></div>
+          </div>
+          <div class="metric-row">
+            <div class="metric"><strong>4</strong><span>模拟 UID</span></div>
+            <div class="metric"><strong class="green">2</strong><span>PASS</span></div>
+            <div class="metric"><strong style="color:#9a6700">1</strong><span>BLOCKED_ENV_DATA</span></div>
+            <div class="metric"><strong class="accent">1</strong><span>FAIL_PRODUCT</span></div>
+          </div>
+        </div>
+        <div class="footer"><span>UI + API + 状态 + 记录</span><span>Evidence first</span></div>
+      </div>
+    </section>
+
+    <section data-screen-label="04 发现异常">
+      <div class="slide dark">
+        <div class="topline"><div class="brand"><img src="assets/inke-logo.jpg" alt="映客"><span>测试真正的价值</span></div><span class="page-mark">04 / 09</span></div>
+        <div class="split" style="padding-top:48px">
+          <div>
+            <div class="kicker">PRODUCT ANOMALY · UID 22030650</div>
+            <h2>错误响应，<br>却发生了<span class="gold">真实扣券与写记录</span></h2>
+            <div class="timeline">
+              <div class="event"><div class="dot"></div><div><strong>兑换后</strong><p>ticket 0 → 1</p></div></div>
+              <div class="event"><div class="dot"></div><div><strong>drawPrize</strong><p>dm_error = 20004 · “机会不足～”</p></div></div>
+              <div class="event"><div class="dot"></div><div><strong>再次读取</strong><p>ticket 1 → 0</p></div></div>
+              <div class="event"><div class="dot"></div><div><strong>记录接口</strong><p>drawPrizeLog 存在中奖记录</p></div></div>
+            </div>
+          </div>
+          <div class="code-panel">
+            <div class="dim">GET /drawPrize?num=1&amp;draw_type=A</div>
+            <div>HTTP <span class="ok">200</span></div>
+            <div>dm_error: <span class="bad">20004</span></div>
+            <div>error_msg: <span class="bad">机会不足～</span></div>
+            <div>data: <span class="dim">null</span></div>
+            <br>
+            <div>before.ticket: <span class="ok">1</span></div>
+            <div>after.ticket: <span class="bad">0</span></div>
+            <div>record.count: <span class="bad">1</span></div>
+            <br>
+            <div class="bad">=> FAIL_PRODUCT</div>
+          </div>
+        </div>
+        <div class="footer"><span>不要只看弹窗成功或失败，要核对状态一致性</span><span>State consistency</span></div>
+      </div>
+    </section>
+
+    <section data-screen-label="05 证据与报告">
+      <div class="slide red">
+        <div class="topline"><div class="brand"><img src="assets/inke-logo.jpg" alt="映客"><span>可审计证据链</span></div><span class="page-mark">05 / 09</span></div>
+        <div style="padding-top:42px">
+          <div class="kicker">EVIDENCE PACKAGE</div>
+          <h2>测试不是一句“通过”，<br>而是一套可以回看的证据</h2>
+          <div class="evidence-strip">
+            <div class="evidence"><img src="assets/exchange-modal.jpg" alt="兑换弹窗"></div>
+            <div class="evidence"><img src="assets/result-modal.jpg" alt="结果弹窗"></div>
+            <div class="evidence record"><img src="assets/record-modal.jpg" alt="记录弹窗"></div>
+          </div>
+          <p style="margin-top:24px;font-size:27px;color:rgba(255,255,255,.76)">每个 UID 固化：页面截图 · before/action/after payload · 结果记录 · 最终分类 · HTML 报告</p>
+        </div>
+        <div class="footer"><span>证据目录按阶段与 UID 组织</span><span>Markdown + HTML</span></div>
+      </div>
+    </section>
+
+    <section data-screen-label="06 需求推动演进">
+      <div class="slide dark">
+        <div class="topline"><div class="brand"><img src="assets/inke-logo.jpg" alt="映客"><span>对话驱动的方案演进</span></div><span class="page-mark">06 / 09</span></div>
+        <div style="padding-top:50px">
+          <div class="kicker">WHAT WAS MISSING</div>
+          <div class="quote">“这个测试还少点什么？”<small>每一次追问，都把一次性脚本推进成更可靠的方法。</small></div>
+          <div class="iterations">
+            <div class="iteration"><b>01</b><p>没有先问测试最想证明什么</p></div>
+            <div class="iteration"><b>02</b><p>不应要求前端代码与 H5 地址</p></div>
+            <div class="iteration"><b>03</b><p>需要自动找到 ali-testqa / ali-gray JSON</p></div>
+            <div class="iteration"><b>04</b><p>需要服务器时间与 version 门禁</p></div>
+            <div class="iteration"><b>05</b><p>需要活动前 / 中 / 后边界 case</p></div>
+            <div class="iteration"><b>06</b><p>不能把 workflow 写死为抽奖与奖池</p></div>
+            <div class="iteration"><b>07</b><p>每种能力都要有数据准备与造数计划</p></div>
+            <div class="iteration"><b>08</b><p>CI、清理与重置必须有安全边界</p></div>
+          </div>
+        </div>
+        <div class="footer"><span>反馈不是补丁，而是抽象边界</span><span>Iterate the contract</span></div>
+      </div>
+    </section>
+
+    <section data-screen-label="07 从写死到动态">
+      <div class="slide paper">
+        <div class="topline"><div class="brand"><img src="assets/inke-logo.jpg" alt="映客"><span>抽象方式改变</span></div><span class="page-mark">07 / 09</span></div>
+        <div style="padding-top:48px">
+          <div class="kicker">FROM FIXED FLOW TO CAPABILITY DISCOVERY</div>
+          <h2>Skill 不应该记住某个活动，<br>而应该学会<span class="accent">读懂活动</span></h2>
+          <div class="compare">
+            <div class="compare-col">
+              <h3>早期写法：固定业务流程</h3>
+              <ul>
+                <li>页面 → 兑换 → 抽奖 → 记录</li>
+                <li>默认所有活动都有奖池</li>
+                <li>数据不足就只能阻塞</li>
+                <li>测试点靠人工提前给出</li>
+              </ul>
+            </div>
+            <div class="compare-arrow">→</div>
+            <div class="compare-col after">
+              <h3>最终写法：动态能力发现</h3>
+              <ul>
+                <li>读取 Go route / JSON / Wiki</li>
+                <li>识别任务、榜单、报名、兑换、领奖等能力</li>
+                <li>为每种能力生成数据与边界矩阵</li>
+                <li>选择最低成本主动作和结果面</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>抽奖只是能力类型之一</span><span>Mechanism over business type</span></div>
+      </div>
+    </section>
+
+    <section data-screen-label="08 最终工作流">
+      <div class="slide dark">
+        <div class="topline"><div class="brand"><img src="assets/inke-logo.jpg" alt="映客"><span>inke-act-test 最终结构</span></div><span class="page-mark">08 / 09</span></div>
+        <div style="padding-top:44px">
+          <div class="kicker">THE REUSABLE PIPELINE</div>
+          <h2>活动名进来，<span class="gold">动态测试矩阵</span>出去</h2>
+          <div class="pipeline">
+            <div class="pipe-item"><b>01 · INPUT</b><strong>module + env + UID + Wiki</strong><p>不再要求前端目录和 H5 地址</p></div>
+            <div class="pipe-item"><b>02 · DISCOVER</b><strong>Go / JSON / H5 / API</strong><p>自动匹配 ali-testqa 或 ali-gray</p></div>
+            <div class="pipe-item"><b>03 · GOAL GATE</b><strong>先明确最想证明什么</strong><p>冒烟、回归、专项、框架</p></div>
+            <div class="pipe-item"><b>04 · CAPABILITY</b><strong>发现活动能力</strong><p>任务、榜单、报名、兑换、领奖……</p></div>
+            <div class="pipe-item"><b>05 · DATA</b><strong>数据准备与造数 dry-run</strong><p>READY / NEEDS_SEED / BLOCKED</p></div>
+            <div class="pipe-item"><b>06 · BOUNDARY</b><strong>边界与异常 case</strong><p>时间、数值、资格、库存、幂等</p></div>
+            <div class="pipe-item"><b>07 · EXECUTE</b><strong>最小 mutation 执行</strong><p>before / action / after</p></div>
+            <div class="pipe-item"><b>08 · DELIVER</b><strong>报告、CI 与审计证据</strong><p>产品失败与环境阻塞分开</p></div>
+          </div>
+        </div>
+        <div class="footer"><span>时间与 version 是测试前置门禁</span><span>Reusable by design</span></div>
+      </div>
+    </section>
+
+    <section data-screen-label="09 总结">
+      <div class="slide red">
+        <div class="topline"><div class="brand"><img src="assets/inke-logo.jpg" alt="映客"><span>周会结论</span></div><span class="page-mark">09 / 09</span></div>
+        <div style="padding-top:55px">
+          <div class="kicker">TAKEAWAYS</div>
+          <h2>这次真正沉淀的，<br>不是一份报告，而是<span class="gold">测试决策方式</span></h2>
+          <div class="takeaways">
+            <div class="takeaway"><b>01</b><p>先问目标，再决定测试深度。</p></div>
+            <div class="takeaway"><b>02</b><p>先发现能力，再生成测试矩阵。</p></div>
+            <div class="takeaway"><b>03</b><p>每个能力都要配数据准备和边界 case。</p></div>
+            <div class="takeaway"><b>04</b><p>结论必须由 UI、API 和状态证据共同支持。</p></div>
+            <div class="takeaway"><b>05</b><p>产品失败、数据阻塞、权限阻塞必须分开。</p></div>
+            <div class="takeaway"><b>06</b><p>Skill 抽象机制，不写死某一种业务。</p></div>
+          </div>
+          <div class="final-command">$inke-act-test 测 &lt;moduleName&gt;<br>环境：testqa / gray · uid：... · Wiki：可选</div>
+        </div>
+        <div class="footer"><span>下一次活动，从 module name 开始</span><span>Thanks</span></div>
+      </div>
+    </section>
+  </deck-stage>
+  <script src="deck_stage.js"></script>
+</body>
+</html>
