@@ -1,0 +1,23 @@
+
+:root { --scale: 1; }
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #07111f; }
+body { font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif; }
+.slide {
+  position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px;
+  overflow: hidden; transform: translate(-50%, -50%) scale(var(--scale));
+  transform-origin: center; background: #081421; color: #fff; letter-spacing: 0;
+}
+.slide-background { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; z-index: 0; }
+.element { position: absolute; transform-origin: center; }
+.shape-element { overflow: hidden; }
+.shape-element.has-text { display: flex; }
+.text-content { width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.paragraph { margin: 0; white-space: pre-wrap; overflow-wrap: break-word; }
+.paragraph + .paragraph { margin-top: 7px; }
+.image-element { overflow: hidden; }
+.image-element img { position: absolute; display: block; object-fit: fill; max-width: none; }
+.connector { transform-origin: center; }
+.enter { animation: enter .38s cubic-bezier(.2,.72,.2,1) both; }
+@keyframes enter { from { opacity: 0; transform: translateY(7px) rotate(var(--rotation, 0deg)); } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .enter { animation: none; } }

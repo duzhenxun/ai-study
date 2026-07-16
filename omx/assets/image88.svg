@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="text/ecmascript" fill="none" width="48" zoomAndPan="magnify" style="stroke-opacity: 1.0;" contentStyleType="text/css" viewBox="0 0 48 48" height="48" preserveAspectRatio="xMidYMid meet" version="1.0">
+<path fill="#00E5FF" fill-opacity="1.0" stroke-width="2.0" d="M12 4H4V12H12V4Z" stroke-linejoin="round" stroke="#00E5FF"/>
+<path fill="#00E5FF" fill-opacity="1.0" stroke-width="2.0" d="M44 36H36V44H44V36Z" stroke-linejoin="round" stroke="#00E5FF"/>
+<path fill="#00E5FF" fill-opacity="1.0" stroke-width="2.0" d="M12 36H4V44H12V36Z" stroke-linejoin="round" stroke="#00E5FF"/>
+<path fill="#00E5FF" fill-opacity="1.0" stroke-width="2.0" d="M44 4H36V12H44V4Z" stroke-linejoin="round" stroke="#00E5FF"/>
+<path d="M8 36V12" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round" stroke="#00E5FF"/>
+<path d="M40 36V12" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round" stroke="#00E5FF"/>
+<path d="M12 8H36" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round" stroke="#00E5FF"/>
+<path d="M12 40H36" stroke-width="2.0" stroke-linejoin="round" stroke-linecap="round" stroke="#00E5FF"/>
+<path stroke-linecap="round" fill-opacity="1.0" fill="#00E5FF" fill-rule="evenodd" stroke-linejoin="round" d="M16 16H25.6V22.4H32V32H22.4V25.6H16V16Z" stroke="#00E5FF" clip-rule="evenodd" stroke-width="2.0"/>
+</svg>
