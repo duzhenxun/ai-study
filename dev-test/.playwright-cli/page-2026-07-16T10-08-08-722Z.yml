@@ -1,0 +1,69 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - generic:
+      - text: → → → → → → →
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - generic [ref=e8]:
+            - img "映客" [ref=e9]
+            - generic [ref=e10]: 最终结果
+          - generic [ref=e11]: 13 / 13
+        - generic [ref=e12]:
+          - generic [ref=e13]: PARTIAL PASS WITH PRODUCT ANOMALY
+          - heading "Deep Interview 负责想清楚， Ultragoal 负责做到底并留下证据" [level=2] [ref=e14]:
+            - text: Deep Interview 负责想清楚，
+            - text: Ultragoal 负责做到底并留下证据
+          - generic [ref=e15]:
+            - generic [ref=e16]:
+              - table [ref=e17]:
+                - rowgroup [ref=e18]:
+                  - row "UID 最终结论 关键说明" [ref=e19]:
+                    - columnheader "UID" [ref=e20]
+                    - columnheader "最终结论" [ref=e21]
+                    - columnheader "关键说明" [ref=e22]
+                - rowgroup [ref=e23]:
+                  - row "22030647 PASS 已有券，互动与记录正常" [ref=e24]:
+                    - cell "22030647" [ref=e25]
+                    - cell "PASS" [ref=e26]
+                    - cell "已有券，互动与记录正常" [ref=e27]
+                  - row "22030648 PASS 兑换后互动与记录正常" [ref=e28]:
+                    - cell "22030648" [ref=e29]
+                    - cell "PASS" [ref=e30]
+                    - cell "兑换后互动与记录正常" [ref=e31]
+                  - row "22030649 BLOCKED_ENV_DATA 金币 0、券 0，按边界不造数" [ref=e32]:
+                    - cell "22030649" [ref=e33]
+                    - cell "BLOCKED_ENV_DATA" [ref=e34]
+                    - cell "金币 0、券 0，按边界不造数" [ref=e35]
+                  - row "22030650 FAIL_PRODUCT 错误响应但扣券并写记录" [ref=e36]:
+                    - cell "22030650" [ref=e37]
+                    - cell "FAIL_PRODUCT" [ref=e38]
+                    - cell "错误响应但扣券并写记录" [ref=e39]
+              - generic [ref=e40]:
+                - generic [ref=e41]:
+                  - strong [ref=e42]: 7/7
+                  - text: Ultragoal 完成
+                - generic [ref=e43]:
+                  - strong [ref=e44]: 190,938
+                  - text: Codex Goal tokens
+                - generic [ref=e45]:
+                  - strong [ref=e46]: 1h42m
+                  - text: 持续执行时间
+            - generic [ref=e47]:
+              - generic [ref=e48]:
+                - generic [ref=e49]: "01"
+                - paragraph [ref=e50]: 提示词给上下文，Deep Interview 把意图、范围和不可做事项变成规格。
+              - generic [ref=e51]:
+                - generic [ref=e52]: "02"
+                - paragraph [ref=e53]: Goal 拆得多不等于可执行；64 个碎片必须压缩成 7 个验收目标。
+              - generic [ref=e54]:
+                - generic [ref=e55]: "03"
+                - paragraph [ref=e56]: Ultragoal 的价值是持续状态、逐目标证据和失败后可恢复，而不只是任务列表。
+              - generic [ref=e57]:
+                - generic [ref=e58]: "04"
+                - paragraph [ref=e59]: 这套经验最终进入 inke-act-develop-test：自动发现、能力门禁、边界数据和安全 mutation 成为标准能力。
+        - generic [ref=e60]:
+          - generic [ref=e61]: 完整链路：Prompt → Interview → Spec → Goals → Evidence → Verdict
+          - generic [ref=e62]: Thanks
+  - generic [ref=e64] [cursor=pointer]: ‹
+  - generic [ref=e66] [cursor=pointer]: ›
+  - generic [ref=e67]: 13 / 13

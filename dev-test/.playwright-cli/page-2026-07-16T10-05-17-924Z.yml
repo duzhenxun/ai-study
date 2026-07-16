@@ -1,0 +1,77 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - generic:
+      - generic [ref=e213]:
+        - generic [ref=e214]:
+          - generic [ref=e215]:
+            - img "映客" [ref=e216]
+            - generic [ref=e217]: Ultragoal 执行事件 · G001-G003
+          - generic [ref=e218]: 07 / 10
+        - generic [ref=e219]:
+          - generic [ref=e220]: READINESS → LOAD → EXCHANGE
+          - heading "先证明环境可测， 再做最小 mutation" [level=2] [ref=e221]:
+            - text: 先证明环境可测，
+            - text: 再做最小 mutation
+          - generic [ref=e222]:
+            - generic [ref=e223]:
+              - generic [ref=e224]:
+                - generic [ref=e225]: G001
+                - paragraph [ref=e226]: 四个 H5 全部 HTTP 200；建立 API 捕获路径和 UID 数据矩阵。
+              - generic [ref=e227]:
+                - generic [ref=e228]: G002
+                - paragraph [ref=e229]: 四个 UID 页面加载、规则 / 记录入口、互动档位、用户态和广播均可读取。
+              - generic [ref=e230]:
+                - generic [ref=e231]: G003
+                - paragraph [ref=e232]: 22030648、22030650 各兑换 1 张券；22030647 已有 124 张券跳过兑换。
+              - generic [ref=e233]:
+                - generic [ref=e234]: LIMIT
+                - paragraph [ref=e235]: 22030649 金币 0、券 0；按 Deep Interview 边界，不外部造数，分类为环境数据阻塞。
+              - generic [ref=e236]:
+                - generic [ref=e237]: GAP
+                - paragraph [ref=e238]: drawBuyBag 原始响应因捕获超时缺失；为避免重复扣费，没有重放 mutation。
+            - generic [ref=e239]:
+              - table [ref=e240]:
+                - rowgroup [ref=e241]:
+                  - row "UID 初始状态 动作 结果" [ref=e242]:
+                    - columnheader "UID" [ref=e243]
+                    - columnheader "初始状态" [ref=e244]
+                    - columnheader "动作" [ref=e245]
+                    - columnheader "结果" [ref=e246]
+                - rowgroup [ref=e247]:
+                  - row "22030647 ticket 124 跳过兑换 READY" [ref=e248]:
+                    - cell "22030647" [ref=e249]
+                    - cell "ticket 124" [ref=e250]
+                    - cell "跳过兑换" [ref=e251]
+                    - cell "READY" [ref=e252]
+                  - row "22030648 ticket 0 gold -77 / ticket +1 READY" [ref=e253]:
+                    - cell "22030648" [ref=e254]
+                    - cell "ticket 0" [ref=e255]
+                    - cell "gold -77 / ticket +1" [ref=e256]
+                    - cell "READY" [ref=e257]
+                  - row "22030649 gold 0 / ticket 0 不造数 BLOCKED_ENV_DATA" [ref=e258]:
+                    - cell "22030649" [ref=e259]
+                    - cell "gold 0 / ticket 0" [ref=e260]
+                    - cell "不造数" [ref=e261]
+                    - cell "BLOCKED_ENV_DATA" [ref=e262]
+                  - row "22030650 ticket 0 gold -77 / ticket +1 READY" [ref=e263]:
+                    - cell "22030650" [ref=e264]
+                    - cell "ticket 0" [ref=e265]
+                    - cell "gold -77 / ticket +1" [ref=e266]
+                    - cell "READY" [ref=e267]
+              - generic [ref=e268]:
+                - generic [ref=e269]:
+                  - strong [ref=e270]: 4/4
+                  - text: 页面加载通过
+                - generic [ref=e271]:
+                  - strong [ref=e272]: "3"
+                  - text: 可执行互动
+                - generic [ref=e273]:
+                  - strong [ref=e274]: "1"
+                  - text: 数据阻塞
+        - generic [ref=e275]:
+          - generic [ref=e276]: 没有隐藏缺口，也没有为了跑通而突破边界
+          - generic [ref=e277]: Evidence over optimism
+      - text: → → →
+  - generic [ref=e17] [cursor=pointer]: ‹
+  - generic [ref=e19] [cursor=pointer]: ›
+  - generic [ref=e20]: 7 / 10

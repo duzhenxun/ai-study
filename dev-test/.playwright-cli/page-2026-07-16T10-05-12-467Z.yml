@@ -1,0 +1,37 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - generic:
+      - generic [ref=e22]:
+        - generic [ref=e23]:
+          - generic [ref=e24]:
+            - img "映客" [ref=e25]
+            - generic [ref=e26]: 会话起点
+          - generic [ref=e27]: 02 / 10
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - generic [ref=e30]: THE ORIGINAL PROMPT
+            - heading "我最开始， 只给了测试对象和入口" [level=2] [ref=e31]:
+              - text: 我最开始，
+              - text: 只给了测试对象和入口
+            - generic [ref=e32]:
+              - generic [ref=e33]:
+                - generic [ref=e34]: MODULE
+                - paragraph [ref=e35]: act202501_game_pitch_pot
+              - generic [ref=e36]:
+                - generic [ref=e37]: ENV
+                - paragraph [ref=e38]: TestQA H5
+              - generic [ref=e39]:
+                - generic [ref=e40]: USERS
+                - paragraph [ref=e41]: 22030647 ～ 22030650
+              - generic [ref=e42]:
+                - generic [ref=e43]: ACTIONS
+                - paragraph [ref=e44]: 抽奖、看结果、兑换
+            - paragraph [ref=e45]: 信息足够“开始调查”，但还不足以决定测试深度、数据边界、证据标准和失败分类。
+          - generic [ref=e47]: $deep-interview 活动自动化测方案 我现在想自动化测试一个活动， 你帮我规划一下如何测试。 服务端代码：.../act202501_game_pitch_pot 前端代码：.../202607/game_pitch_pot 测试 H5：testqaboc.../index.html 模拟用户：22030647 到 22030650 参数：?uid=22030647&sid=1 需要抽奖、看抽奖、兑换。 我想看一下你的方案。
+        - generic [ref=e48]:
+          - generic [ref=e49]: 输入是素材，不是执行规格
+          - generic [ref=e50]: Prompt ≠ Plan
+      - text: → → →
+  - generic [ref=e17] [cursor=pointer]: ‹
+  - generic [ref=e19] [cursor=pointer]: ›
+  - generic [ref=e20]: 2 / 10

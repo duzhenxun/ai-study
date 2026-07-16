@@ -1,0 +1,52 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - generic:
+      - generic [ref=e167]:
+        - generic [ref=e168]:
+          - generic [ref=e169]:
+            - img "映客" [ref=e170]
+            - generic [ref=e171]: Ultragoal Durable Plan
+          - generic [ref=e172]: 06 / 10
+        - generic [ref=e173]:
+          - generic [ref=e174]: THE EXECUTION GRAPH
+          - heading "7 个 Goal，覆盖准备、动作、证据和结论" [level=2] [ref=e175]
+          - generic [ref=e176]:
+            - generic [ref=e177]:
+              - generic [ref=e178]: G001
+              - strong [ref=e179]: 范围门禁与证据矩阵
+              - paragraph [ref=e180]: 确认 URL、UID、允许的证据源和数据就绪状态。
+            - generic [ref=e181]:
+              - generic [ref=e182]: G002
+              - strong [ref=e183]: 页面加载冒烟
+              - paragraph [ref=e184]: 四个 UID 页面、核心控件、用户配置与广播。
+            - generic [ref=e185]:
+              - generic [ref=e186]: G003
+              - strong [ref=e187]: 条件兑换冒烟
+              - paragraph [ref=e188]: 券不足时做最小页面兑换，核对金币和券方向。
+            - generic [ref=e189]:
+              - generic [ref=e190]: G004
+              - strong [ref=e191]: 最低成本互动
+              - paragraph [ref=e192]: 每个可测 UID 只执行一次最低成本主动作。
+            - generic [ref=e193]:
+              - generic [ref=e194]: G005
+              - strong [ref=e195]: 记录读取
+              - paragraph [ref=e196]: 读取 drawPrizeLog，确认结果记录可追溯。
+            - generic [ref=e197]:
+              - generic [ref=e198]: G006
+              - strong [ref=e199]: 后端 / 日志证据
+              - paragraph [ref=e200]: 补后端侧证明；不可访问则明确 BLOCKED_ACCESS。
+            - generic [ref=e201]:
+              - generic [ref=e202]: G007
+              - strong [ref=e203]: 最终分类报告
+              - paragraph [ref=e204]: 按 UID 汇总 PASS、产品失败和环境 / 权限阻塞。
+          - generic [ref=e205]:
+            - generic [ref=e206]: Codex Goal：负责跨轮持续执行
+            - generic [ref=e207]: ledger.jsonl：记录 started / completed / evidence
+            - generic [ref=e208]: checkpoint：每个 Goal 后验证状态
+        - generic [ref=e209]:
+          - generic [ref=e210]: 每个目标都有 Acceptance Evidence
+          - generic [ref=e211]: Durable, auditable, resumable
+      - text: → → →
+  - generic [ref=e17] [cursor=pointer]: ‹
+  - generic [ref=e19] [cursor=pointer]: ›
+  - generic [ref=e20]: 6 / 10

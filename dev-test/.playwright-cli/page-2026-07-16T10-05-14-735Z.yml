@@ -1,0 +1,51 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - generic:
+      - generic [ref=e104]:
+        - generic [ref=e105]:
+          - generic [ref=e106]:
+            - img "映客" [ref=e107]
+            - generic [ref=e108]: Deep Interview 输出
+          - generic [ref=e109]: 04 / 10
+        - generic [ref=e110]:
+          - generic [ref=e111]: CRYSTALLIZED SPEC
+          - heading "Deep-interview 已完成， 方案已固化" [level=2] [ref=e112]:
+            - text: Deep-interview 已完成，
+            - text: 方案已固化
+          - generic [ref=e113]:
+            - generic [ref=e114]:
+              - generic [ref=e115]:
+                - heading "目标" [level=3] [ref=e116]
+                - paragraph [ref=e117]: TestQA 第一版核心冒烟，用 4 个 UID 判断页面、兑换、互动、结果和记录链路是否可用。
+              - generic [ref=e118]:
+                - heading "最小路径" [level=3] [ref=e119]
+                - paragraph [ref=e120]: 打开 H5 → 读取用户态 → 必要时兑换 → 1 次最低成本互动 → 结果弹窗 → 记录。
+              - generic [ref=e121]:
+                - heading "硬边界" [level=3] [ref=e122]
+                - list [ref=e123]:
+                  - listitem [ref=e124]: 不接 CI
+                  - listitem [ref=e125]: 不清理 / 重置 / 注入
+                  - listitem [ref=e126]: 不测概率、保底、像素差异
+              - generic [ref=e127]:
+                - heading "最终分类" [level=3] [ref=e128]
+                - paragraph [ref=e129]: PASS / FAIL_PRODUCT / BLOCKED_ENV_DATA / BLOCKED_ACCESS
+            - generic [ref=e130]:
+              - generic [ref=e131]:
+                - generic [ref=e132]: CONTEXT
+                - text: .omx/context/activity-auto-test-...md
+              - generic [ref=e133]:
+                - generic [ref=e134]: TRANSCRIPT
+                - text: .omx/interviews/activity-auto-test-...md
+              - generic [ref=e135]:
+                - generic [ref=e136]: EXECUTION SPEC
+                - text: .omx/specs/deep-interview-activity-auto-test-game-pitch-pot.md
+              - generic [ref=e137]:
+                - generic [ref=e138]: PRESSURE-PASS RESOLUTION
+                - text: 允许页面兑换，但不外部造数；余额不足属于环境阻塞。
+        - generic [ref=e139]:
+          - generic [ref=e140]: Deep Interview 只澄清和固化，不直接执行
+          - generic [ref=e141]: Ready for handoff
+      - text: → → →
+  - generic [ref=e17] [cursor=pointer]: ‹
+  - generic [ref=e19] [cursor=pointer]: ›
+  - generic [ref=e20]: 4 / 10

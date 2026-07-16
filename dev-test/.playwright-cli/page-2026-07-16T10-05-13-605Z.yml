@@ -1,0 +1,61 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - generic:
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - generic [ref=e54]:
+            - img "映客" [ref=e55]
+            - generic [ref=e56]: $deep-interview · Standard
+          - generic [ref=e57]: 03 / 10
+        - generic [ref=e58]:
+          - generic [ref=e59]: SOCRATIC CLARIFICATION
+          - heading "一次只问一个问题， 把“想测活动”压成可执行边界" [level=2] [ref=e60]:
+            - text: 一次只问一个问题，
+            - text: 把“想测活动”压成可执行边界
+          - generic [ref=e61]:
+            - generic [ref=e62]:
+              - generic [ref=e63]:
+                - generic [ref=e64]: ROUND 1
+                - paragraph [ref=e65]:
+                  - strong [ref=e66]: 最想证明什么？
+                  - text: 选择：核心冒烟。先证明 H5 核心链路能否提测 / 回归。
+              - generic [ref=e67]:
+                - generic [ref=e68]: ROUND 2
+                - paragraph [ref=e69]:
+                  - strong [ref=e70]: 第一版明确不做什么？
+                  - text: 选择：不接 CI、不做数据清理。
+              - generic [ref=e71]:
+                - generic [ref=e72]: ROUND 3
+                - paragraph [ref=e73]:
+                  - strong [ref=e74]: 断言方式是什么？
+                  - text: 选择：UI + 接口 + 日志 / 管理端证据。
+              - generic [ref=e75]:
+                - generic [ref=e76]: ROUND 4
+                - paragraph [ref=e77]:
+                  - strong [ref=e78]: 固定 UID 数据不足怎么办？
+                  - text: 允许页面兑换；仍不足则记为环境数据阻塞。
+            - generic [ref=e79]:
+              - heading "AMBIGUITY SCORE" [level=3] [ref=e80]
+              - generic [ref=e81]:
+                - generic [ref=e82]:
+                  - strong [ref=e83]: "0.29"
+                  - generic [ref=e85]: 目标未锁
+                - generic [ref=e86]:
+                  - strong [ref=e87]: "0.23"
+                  - generic [ref=e89]: 边界未锁
+                - generic [ref=e90]:
+                  - strong [ref=e91]: "0.17"
+                  - generic [ref=e93]: 证据明确
+                - generic [ref=e94]:
+                  - strong [ref=e95]: "0.12"
+                  - generic [ref=e97]: 可以固化
+              - generic [ref=e98]:
+                - text: Standard 阈值：≤ 0.20
+                - strong [ref=e99]: 最终 0.12，满足 crystallize 条件
+        - generic [ref=e100]:
+          - generic [ref=e101]: 目标 → 非目标 → 证据 → 压力测试
+          - generic [ref=e102]: One question per round
+      - text: → → →
+  - generic [ref=e17] [cursor=pointer]: ‹
+  - generic [ref=e19] [cursor=pointer]: ›
+  - generic [ref=e20]: 3 / 10

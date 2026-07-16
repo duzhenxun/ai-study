@@ -1,0 +1,18 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - generic:
+      - generic [ref=e6]:
+        - img "投壶祈福活动页面" [ref=e7]
+        - generic [ref=e9]:
+          - generic [ref=e10]: WEEKLY SHARE · DEEP INTERVIEW × ULTRAGOAL
+          - heading "从一句提示词 到一套可审计的测试" [level=1] [ref=e11]:
+            - text: 从一句提示词
+            - text: 到一套可审计的测试
+          - paragraph [ref=e12]: 投壶祈福 · 活动自动化测试完整会话复盘
+        - generic [ref=e13]:
+          - generic [ref=e14]: 映客活动研发 · 周会分享
+          - generic [ref=e15]: 2026.07.16
+      - text: → → →
+  - generic [ref=e17] [cursor=pointer]: ‹
+  - generic [ref=e19] [cursor=pointer]: ›
+  - generic [ref=e20]: 1 / 10

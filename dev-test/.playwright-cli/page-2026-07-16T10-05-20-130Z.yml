@@ -1,0 +1,56 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - generic:
+      - text: → → →
+      - generic [ref=e315]:
+        - generic [ref=e316]:
+          - generic [ref=e317]:
+            - img "映客" [ref=e318]
+            - generic [ref=e319]: 产品异常 + Final Quality Gate
+          - generic [ref=e320]: 09 / 10
+        - generic [ref=e321]:
+          - generic [ref=e322]: WHY THE EVIDENCE CHAIN MATTERS
+          - heading "UID 22030650：报错了， 但券被扣了、记录也写了" [level=2] [ref=e323]:
+            - text: UID 22030650：报错了，
+            - text: 但券被扣了、记录也写了
+          - generic [ref=e324]:
+            - generic [ref=e326]:
+              - generic [ref=e329]:
+                - strong [ref=e330]: BEFORE
+                - paragraph [ref=e331]: 兑换完成，ticket 0 → 1
+              - generic [ref=e334]:
+                - strong [ref=e335]: ACTION
+                - paragraph [ref=e336]: drawPrize 返回 dm_error=20004，“机会不足～”
+              - generic [ref=e339]:
+                - strong [ref=e340]: AFTER
+                - paragraph [ref=e341]: ticket 1 → 0，业务状态发生变化
+              - generic [ref=e344]:
+                - strong [ref=e345]: RECORD
+                - paragraph [ref=e346]: drawPrizeLog count=1，存在“天生一对”记录
+            - generic [ref=e347]:
+              - generic [ref=e348]:
+                - generic [ref=e349]:
+                  - generic [ref=e350]: CLEANER
+                  - strong [ref=e351]: PASS
+                  - paragraph [ref=e352]: ai-slop-cleaner no-op，未掩盖证据缺口。
+                - generic [ref=e353]:
+                  - generic [ref=e354]: VERIFY
+                  - strong [ref=e355]: 0 missing
+                  - paragraph [ref=e356]: G007 引用的 39 条证据路径全部存在。
+                - generic [ref=e357]:
+                  - generic [ref=e358]: REVIEW
+                  - strong [ref=e359]: APPROVE
+                  - paragraph [ref=e360]: 独立 code-reviewer 复核报告和 payload。
+                - generic [ref=e361]:
+                  - generic [ref=e362]: ARCHITECT
+                  - strong [ref=e363]: CLEAR
+                  - paragraph [ref=e364]: 7 条范围与安全 invariant 全部通过。
+              - generic [ref=e365]:
+                - generic [ref=e366]: FAIL_PRODUCT
+                - paragraph [ref=e367]: 不能只看错误弹窗；接口响应、扣券状态和记录写入存在不一致。
+        - generic [ref=e368]:
+          - generic [ref=e369]: 强证据链把“看起来失败”变成可定位的产品异常
+          - generic [ref=e370]: State consistency
+  - generic [ref=e17] [cursor=pointer]: ‹
+  - generic [ref=e19] [cursor=pointer]: ›
+  - generic [ref=e20]: 9 / 10

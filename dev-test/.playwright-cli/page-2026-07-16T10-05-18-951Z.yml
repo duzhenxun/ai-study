@@ -1,0 +1,50 @@
+- generic [ref=e2]:
+  - generic [ref=e279]:
+    - generic [ref=e280]:
+      - generic [ref=e281]:
+        - img "映客" [ref=e282]
+        - generic [ref=e283]: Ultragoal 执行事件 · G004-G007
+      - generic [ref=e284]: 08 / 10
+    - generic [ref=e285]:
+      - generic [ref=e286]: ACTION → RECORD → CLASSIFICATION
+      - heading "每次互动都要回到结果、状态与记录" [level=2] [ref=e287]
+      - generic [ref=e288]:
+        - figure "G003 · 最小兑换" [ref=e289]:
+          - img "兑换弹窗" [ref=e290]
+          - generic [ref=e291]: G003 · 最小兑换
+        - figure "G004 · 结果弹窗" [ref=e292]:
+          - img "结果弹窗" [ref=e293]
+          - generic [ref=e294]: G004 · 结果弹窗
+        - figure "G005 · 记录证据" [ref=e295]:
+          - img "记录弹窗" [ref=e296]
+          - generic [ref=e297]: G005 · 记录证据
+      - generic [ref=e298]:
+        - generic [ref=e299]:
+          - generic [ref=e300]: G004
+          - strong [ref=e301]:
+            - text: 2 个正常互动
+            - text: 1 个异常互动
+          - text: →
+        - generic [ref=e302]:
+          - generic [ref=e303]: G005
+          - strong [ref=e304]:
+            - text: 4 个 UID
+            - text: 记录接口可读
+          - text: →
+        - generic [ref=e305]:
+          - generic [ref=e306]: G006
+          - strong [ref=e307]:
+            - text: API 证据齐
+            - text: 日志权限阻塞
+          - text: →
+        - generic [ref=e308]:
+          - generic [ref=e309]: G007
+          - strong [ref=e310]:
+            - text: 生成最终
+            - text: 逐 UID 报告
+    - generic [ref=e311]:
+      - generic [ref=e312]: G001-G007 全部完成
+      - generic [ref=e313]: 7 / 7 complete
+  - generic [ref=e17] [cursor=pointer]: ‹
+  - generic [ref=e19] [cursor=pointer]: ›
+  - generic [ref=e20]: 8 / 10
