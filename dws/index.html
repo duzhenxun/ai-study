@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>DWS 与钉钉机器人技术分享</title><style>
+:root{--p:#2563eb;--p2:#1e40af;--bg:#f3f6fb;--card:#fff;--t:#172033;--m:#64748b;--b:#dbe4f0;--soft:#eff6ff;--ok:#16a34a;--warn:#d97706}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--t)}body{overflow:hidden}.wrap{height:100vh;display:flex;flex-direction:column}.top{height:58px;background:#fff;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;padding:0 28px}.brand{font-weight:800;color:var(--p2)}.meta{font-size:13px;color:var(--m)}.deck{flex:1;position:relative}.slide{display:none;height:100%;padding:42px 7vw 28px;overflow:auto}.slide.on{display:block}.cover{background:linear-gradient(135deg,#1e3a8a,#2563eb 55%,#60a5fa);color:#fff}.cover h1{font-size:clamp(40px,7vw,86px);line-height:1.1;margin:15vh 0 18px}.cover p{font-size:clamp(18px,2vw,28px);max-width:720px;opacity:1;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.28)}.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--p);font-weight:700}.cover .eyebrow{color:#bfdbfe}h2{font-size:clamp(28px,4vw,52px);margin:10px 0 14px;color:var(--p2)}h3{margin:0 0 8px;color:var(--p2)}p{line-height:1.75;color:#475569}.lead{font-size:20px;max-width:850px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}.grid.two{grid-template-columns:repeat(2,1fr)}.card{background:#fff;border:1px solid var(--b);border-radius:14px;padding:20px;box-shadow:0 5px 18px #1e3a8a0b}.num{font-size:32px;font-weight:800;color:var(--p);margin-bottom:8px}.tag{display:inline-block;padding:4px 9px;border-radius:999px;background:var(--soft);color:var(--p2);font-size:12px;font-weight:700;margin:3px}.note{background:#fffbeb;border-left:4px solid #f59e0b;padding:14px 16px;border-radius:8px;margin-top:22px}.q{background:var(--soft);border:1px solid #bfdbfe;border-radius:12px;padding:22px;margin-top:25px}.answer{margin-top:12px;color:var(--ok);font-weight:700}.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:32px 0}.node{background:#fff;border:2px solid #93c5fd;border-radius:12px;padding:16px 18px;text-align:center;min-width:145px;font-weight:700;box-shadow:0 4px 12px #1e3a8a12}.node small{display:block;color:var(--m);font-weight:400;margin-top:5px}.arrow{font-size:24px;color:var(--p);font-weight:800}.code{background:#0f172a;color:#dbeafe;border-radius:12px;padding:20px;white-space:pre-wrap;font:14px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace}.table-wrap{overflow-x:auto;margin-top:24px}table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--b);border-radius:12px;overflow:hidden;font-size:14px}th,td{padding:13px 14px;border:1px solid var(--b);text-align:left;vertical-align:top}th{background:var(--soft);color:var(--p2);font-weight:800}tr:nth-child(even) td{background:#f8fafc}.footer{margin-top:30px;color:var(--m);font-size:13px;border-top:1px solid var(--b);padding-top:12px}.nav{height:66px;background:#fff;border-top:1px solid var(--b);display:flex;align-items:center;justify-content:center;gap:18px}.nav button{border:1px solid var(--p);background:#fff;color:var(--p2);border-radius:8px;padding:9px 18px;cursor:pointer}.nav button.primary{background:var(--p);color:#fff}.progress{color:var(--m);min-width:65px;text-align:center}@media(max-width:650px){.slide{padding:28px 20px 20px}.grid,.grid.two{grid-template-columns:1fr}.flow{gap:6px}.node{min-width:125px;padding:12px;font-size:14px}.arrow{transform:rotate(90deg)}.top{padding:0 16px}.lead{font-size:17px}}@media print{body{overflow:visible}.top,.nav{display:none}.deck{display:block}.slide{display:block;height:auto;min-height:100vh;page-break-after:always}.cover{color:#fff}}
+
+html,body{min-height:0}.deck{min-height:0;overflow:hidden}.slide{min-height:0;height:100%;flex:none}.slide>*{max-width:100%}.slide img{max-width:100%;height:auto}
+</style></head><body><div class="wrap"><header class="top"><div class="brand">DWS · 钉钉机器人与 Agent 通信分享</div><div class="meta">20–30 分钟 · 内部研发分享</div></header><main class="deck" id="deck">
+<section class="slide cover on"><div class="eyebrow">SHARING DECK / SYSTEM ARCHITECTURE</div><h1>把 AI 接进钉钉<br/>DWS 与钉钉机器人架构与流程</h1><p><strong>项目架构与核心流程分享</strong><br/>理解钉钉消息如何进入系统、如何路由到 Pi / Codex，以及“打开 AI”为什么能够自动完成机器人入群。</p><div class="footer" style="color:#dbeafe;border-color:#93c5fd">分享目标：看懂架构图、读懂调用链、能够定位一次消息的完整生命周期</div></section>
+<section class="slide"><div class="eyebrow">分享目标</div><h2>今天聊清楚，你应该能回答三个问题</h2><div class="grid"><div class="card"><div class="num">01</div><h3>消息去哪了？</h3><p>区分 DingTalk Stream 与 DWS 群事件流，理解两个 Worker 的职责。</p></div><div class="card"><div class="num">02</div><h3>Agent 怎么被调用？</h3><p>理解 runAgent 如何分发 Pi / Codex，以及 stdin/stdout 通信差异。</p></div><div class="card"><div class="num">03</div><h3>权限如何生效？</h3><p>理解 groupId + senderId、Session、去重和机器人防循环。</p></div></div><div class="q"><b>分享方式</b><p>先看全局架构，再拆 Pi/Codex，最后跟着私聊、群聊和“打开 AI”流程走一遍。</p></div></section>
+<section class="slide"><div class="eyebrow">第一章 · 项目总览</div><h2>项目整体架构</h2><p class="lead">从消息入口、Worker、核心路由到 Pi / Codex / OpenCode 执行层的完整视图。</p><div class="card" style="margin-top:22px;text-align:center;padding:14px"><img alt="项目整体架构图" src="oh-my-im-architecture.png" style="display:block;width:100%;max-height:60vh;object-fit:contain;border-radius:8px"/></div><div class="footer">讲解顺序：入口 → Worker → 核心服务 → Agent 执行 → 持久化</div></section>
+<section class="slide"><div class="eyebrow">第一章 · DWS 基础</div><h2>DWS 是什么？</h2><div class="grid two"><div class="card"><h3>DingTalk Workspace CLI</h3><p>DWS 是面向钉钉工作台能力的命令行工具，负责认证、群聊、联系人、机器人和事件流操作。</p></div><div class="card"><h3>本项目中的位置</h3><p>DWS 不执行 AI，它负责把群消息送进 Worker，并提供群、成员、机器人等管理能力。</p></div></div><div class="note">理解 DWS 的关键：它是消息与钉钉资源的控制入口，不是模型执行引擎。</div></section>
+
+<section class="slide"><div class="eyebrow">第一章 · DWS 实战命令 · 1</div><h2>登录当前 DWS 账号</h2><div class="code">dws auth status
+dws auth login --device
+dws contact +me</div><div class="grid two"><div class="card"><h3>auth status</h3><p>查看 authenticated、企业、当前账号和 Token 有效期。</p></div><div class="card"><h3>contact +me</h3><p>获取当前 DWS 登录用户的 userId、openDingTalkId 和姓名。</p></div></div><div class="note">事件监听和群消息查询依赖本机 DWS 登录状态。</div></section>
+<section class="slide"><div class="eyebrow">第一章 · DWS 实战命令 · 2</div><h2>监听指定人的消息</h2><div class="code">dws event +listen-im --kind sender \
+  --open-dingtalk-id '&lt;openDingTalkId&gt;' --format ndjson
+
+dws event +listen-im --kind sender \
+  --user-query '师超' --format ndjson</div><p class="lead">适合按人员订阅 IM 消息；输出是 NDJSON，可以被程序逐行消费。</p><div class="q"><b>事件字段重点</b><p>event_id、message_id、conversation_id、sender_open_dingtalk_id、content、create_time。</p></div></section>
+<section class="slide"><div class="eyebrow">第一章 · DWS 实战命令 · 3</div><h2>监听全量群消息</h2><div class="code">dws event +listen-im \
+  --kind all-group \
+  --events message \
+  --format ndjson</div><div class="flow"><div class="node">DWS Event Bus</div><div class="arrow">→</div><div class="node">NDJSON</div><div class="arrow">→</div><div class="node">group-worker</div><div class="arrow">→</div><div class="node">规则过滤</div></div><p class="lead">事件流连接成功，只代表订阅成功；是否触发 AI，还要看群和发送人规则。</p></section>
+<section class="slide"><div class="eyebrow">第一章 · DWS 实战命令 · 4</div><h2>查群、查消息、查成员</h2><div class="code">dws chat search --query '群名称'
+dws chat +chat-list --types group --page-size 5
+dws chat message list --group '&lt;openConversationId&gt;' \
+  --time '...' --direction newer --limit 50 --format json
+dws chat +chat-members-list --conversation-id '&lt;groupId&gt;'
+dws chat +search-msg --sender '姓名' --days 1 \
+  --chat-type group --limit 3 --order desc --format json</div><div class="note">群名用于搜索；后续发送、查消息和加机器人必须使用准确的 openConversationId。</div></section>
+<section class="slide"><div class="eyebrow">第一章 · DWS 实战命令 · 5</div><h2>查找、加入与查看机器人</h2><div class="code">dws chat bot find --query '机器人名称' --format json
+dws chat +chat-add-bot \
+  --robot-code '&lt;robotCode&gt;' \
+  --id '&lt;openConversationId&gt;' --yes --format json
+dws chat +chat-bots --group '&lt;groupId&gt;' --format json
+dws chat +chat-remove-bot --id '&lt;groupId&gt;' \
+  --bot-id '&lt;openBotId&gt;' --yes --format json</div><div class="grid two"><div class="card"><h3>身份字段</h3><p>搜索结果常见 botOpenDingTalkId；群内列表常见 openBotId；加群使用 robotCode。</p></div><div class="card"><h3>安全顺序</h3><p>先查询、再确认目标群和机器人，最后执行添加或移除。</p></div></div></section>
+<section class="slide"><div class="eyebrow">第二章 · Agent 抽象</div><h2>业务层只认识一个入口</h2><div class="code">runAgent(agent, prompt, sessionId, config, callbacks)
+
+agent === "pi"    → runPi(...)
+agent === "codex" → runCodex(...)
+agent === "opencode" → runOpenCode(...)</div><div class="grid two"><div class="card"><h3>统一输入</h3><p>Prompt、Session ID、工作目录、模型和事件回调。</p></div><div class="card"><h3>统一输出</h3><p>AgentResult：sessionId、text、toolStats、durationMs。</p></div></div><div class="q"><b>思考题</b><p>为什么不在 group-worker 里直接 spawn Pi 或 Codex？</p><div class="answer">答案：隔离协议差异，后续替换 Agent 不需要改消息业务。</div></div></section>
+<section class="slide"><div class="eyebrow">第二章 · Pi</div><h2>Pi：RPC 长连接</h2><div class="flow"><div class="node">spawn pi<small>--mode rpc</small></div><div class="arrow">→</div><div class="node">get_state<small>拿 sessionId</small></div><div class="arrow">→</div><div class="node">prompt<small>JSON stdin</small></div><div class="arrow">→</div><div class="node">JSONL 事件<small>delta / tool / settled</small></div></div><div class="grid two"><div class="card"><h3>实时能力</h3><p>text_delta 持续更新卡片；tool_execution_start 展示工具调用。</p></div><div class="card"><h3>运行中引导</h3><p>新消息可以转换为 steer 指令，直接写入正在运行的 Pi 进程。</p></div></div><div class="note">Pi 的核心关键词：RPC、持续进程、增量事件、steer。</div></section>
+<section class="slide"><div class="eyebrow">第二章 · Codex</div><h2>Codex：Exec 单轮进程</h2><div class="code">codex exec --json --skip-git-repo-check \
+  --dangerously-bypass-approvals-and-sandbox \
+  --cd &lt;workDir&gt; -
+
+stdin  → Prompt
+stdout → thread / tool / message / turn.completed</div><div class="grid two"><div class="card"><h3>新会话</h3><p>使用 codex exec，并通过 --cd 指定工作目录。</p></div><div class="card"><h3>恢复会话</h3><p>使用 codex exec resume &lt;sessionId&gt;，继续原有上下文。</p></div></div><div class="note">Codex 当前轮结束后进程退出；后续消息由本地队列合并为下一轮任务。</div></section>
+<section class="slide"><div class="eyebrow">第二章 · OpenCode</div><h2>OpenCode：单轮 CLI 会话</h2><div class="code">opencode run --format json \
+  --dir &lt;workDir&gt; --auto \
+  --model &lt;agentModel&gt; \
+  --session &lt;sessionId&gt; "Prompt"</div><div class="grid two"><div class="card"><h3>启动与恢复</h3><p>首次运行不带 session；后续运行通过 --session 恢复上下文。</p></div><div class="card"><h3>事件处理</h3><p>读取 JSONL stdout，识别 text/message、tool/tool_use 和 error 事件，最终统一转换为 AgentResult。</p></div></div><div class="note">源码实现：opencode-agent.ts 使用 config.opencodeCliPath，工作目录为 codexWorkDir，模型通过 --model 传入。</div></section><section class="slide"><div class="eyebrow">第二章 · 对比</div><h2>相同的出口，不同的节奏</h2><div class="table-wrap"><table><tr><th>维度</th><th>Pi</th><th>Codex</th><th>OpenCode</th></tr><tr><td>启动方式</td><td>pi --mode rpc</td><td>codex exec --json</td><td>opencode run --format json --dir &lt;workDir&gt; --auto</td></tr><tr><td>通信方式</td><td>JSON RPC / JSONL</td><td>stdin Prompt + JSONL stdout</td><td>Prompt 命令行参数 + JSONL stdout</td></tr><tr><td>任务形态</td><td>持续进程</td><td>单轮进程</td><td>单轮 CLI 进程</td></tr><tr><td>运行中引导</td><td>支持 steer</td><td>本地队列，下一轮处理</td><td>不支持 steer；下一轮通过 --session 恢复</td></tr><tr><td>模型来源</td><td>Dashboard 的 Pi 模型</td><td>Codex CLI 自身配置</td><td>Dashboard 配置，通过 --model 传入</td></tr></table></div><div class="q"><b>结论</b><p>上层看到的是同一个 AgentResult，因此回复层可以统一处理。</p></div></section>
+<section class="slide"><div class="eyebrow">第三章 · Agent 切换</div><h2>切换时，每次从哪里读取？</h2><div class="flow"><div class="node">切换关键词<small>monitor-command</small></div><div class="arrow">→</div><div class="node">当前会话状态<small>selectedAgent</small></div><div class="arrow">→</div><div class="node">Dashboard 配置<small>dws-dashboard.json</small></div><div class="arrow">→</div><div class="node">下一次 runAgent</div></div><div class="grid two"><div class="card"><h3>私聊优先级</h3><p>state.selectedAgent → 动态读取 Dashboard → 启动时默认值。</p></div><div class="card"><h3>群聊优先级</h3><p>handleBatch() 读取当前 Dashboard 配置中的 agent。</p></div></div><div class="note">配置变更通常无需重启 Worker；下一次任务会读取新的 Agent 设置。</div></section>
+<section class="slide"><div class="eyebrow">第三章 · Session</div><h2>切换 Agent，但不串线</h2><div class="grid two"><div class="card"><h3>群聊 Session</h3><div class="code">${agent}:${groupId}
+~/.oh-my-im/group-sessions.json</div></div><div class="card"><h3>私聊 Session</h3><div class="code">${agent}:${conversationId}
+~/.oh-my-im/private-sessions.json</div></div></div><div class="flow"><div class="node">Codex:G1</div><div class="arrow">≠</div><div class="node">Pi:G1</div><div class="arrow">≠</div><div class="node">Codex:G2</div></div><p class="lead">Session 的隔离维度是 Agent + 会话主体。切回原 Agent，可以恢复原来的上下文。</p></section>
+<section class="slide"><div class="eyebrow">第四章 · 私聊流程</div><h2>私聊：先鉴权，再执行</h2><div class="flow"><div class="node">DingTalk Stream</div><div class="arrow">→</div><div class="node">单聊判断</div><div class="arrow">→</div><div class="node">去重</div><div class="arrow">→</div><div class="node">白名单</div><div class="arrow">→</div><div class="node">命令 / Agent</div></div><div class="flow"><div class="node">用户 workspace</div><div class="arrow">→</div><div class="node">Prompt</div><div class="arrow">→</div><div class="node">Pi / Codex</div><div class="arrow">→</div><div class="node">卡片 / 文本回复</div></div><div class="note">私聊用户目录：~/.oh-my-im/users/&lt;senderStaffId 或 senderId&gt;/workspace；空白名单时默认拒绝所有人。</div></section>
+<section class="slide"><div class="eyebrow">第四章 · 群聊流程</div><h2>群聊：先过滤，再排队</h2><div class="flow"><div class="node">DWS 群事件<small>NDJSON</small></div><div class="arrow">→</div><div class="node">忽略机器人</div><div class="arrow">→</div><div class="node">eventKey 去重</div><div class="arrow">→</div><div class="node">targets 匹配</div></div><div class="flow"><div class="node">GroupQueue<small>按群隔离</small></div><div class="arrow">→</div><div class="node">批量合并</div><div class="arrow">→</div><div class="node">handleBatch</div><div class="arrow">→</div><div class="node">Agent 回复</div></div><div class="q"><b>关键权限条件</b><p>当前事件的 groupId 与 senderId 必须同时命中 targets。</p></div></section>
+<section class="slide"><div class="eyebrow">第五章 · 打开 AI</div><h2>“打开 AI”不只是一个开关</h2><div class="flow"><div class="node">打开 AI</div><div class="arrow">→</div><div class="node">解析 open</div><div class="arrow">→</div><div class="node">校验操作者</div><div class="arrow">→</div><div class="node">检查机器人</div></div><div class="flow"><div class="node">机器人已在群</div><div class="arrow">或</div><div class="node">Client ID + 自动加群</div><div class="arrow">→</div><div class="node">新增 targets 规则</div></div><div class="note">真正让后续消息进入 Agent 的，不是“机器人在群”本身，而是 groupId + senderId 规则。</div></section><section class="slide"><div class="eyebrow">第五章 · 自动入群</div><h2>从“打开”到“可执行”</h2><div class="flow"><div class="node">groupHasConfiguredRobot</div><div class="arrow">→</div><div class="node">不存在</div><div class="arrow">→</div><div class="node">addBotToGroup</div><div class="arrow">→</div><div class="node">DWS CLI</div></div><div class="code">dws chat +chat-add-bot \
+  --robot-code &lt;Client ID&gt; \
+  --id &lt;openConversationId&gt; --yes</div><div class="grid two"><div class="card"><h3>加群成功</h3><p>继续执行 applyMonitorCommand，写入 groupId + senderId。</p></div><div class="card"><h3>加群失败</h3><p>发送失败原因，提示群主或管理员手动加群。</p></div></div></section>
+<section class="slide"><div class="eyebrow">第六章 · 机器人 Webhook</div><h2>Webhook：主动把结果发到群里</h2><p class="lead">业务服务 → HTTP POST（JSON）→ 群自定义机器人 Webhook → 群消息</p><div class="grid two"><div class="card"><h3>5 种 msgtype</h3><p>text、markdown、link、actionCard、feedCard。</p></div><div class="card"><h3>和消息接收分开理解</h3><p>这里讲主动发送，不是 DingTalk Stream 接收消息，也不是互动卡片更新协议。</p></div></div><div class="note">Webhook 地址含凭证，不能写进 PPT 或公开日志；发送时遵守机器人的关键词、加签或 IP 安全设置，检查响应中的 errcode。</div></section>
+<section class="slide"><div class="eyebrow">第六章 · 机器人 Webhook</div><h2>text：纯文本</h2><div class="code">{
+  "msgtype": "text",
+  "text": {
+    "content": "Pi-Agent任务完成，导出充值记录3197条"
+  },
+  "at": {
+    "isAtAll": false,
+    "atUserIds": [
+      "manager1"
+    ]
+  }
+}</div><div class="note">适合任务完成通知、状态提醒。atUserIds 使用实际用户 ID；示例记录数仅用于演示。</div></section>
+<section class="slide"><div class="eyebrow">第六章 · 机器人 Webhook</div><h2>markdown：格式化报告</h2><div class="code">{
+  "msgtype": "markdown",
+  "markdown": {
+    "title": "今日充值报表",
+    "text": "#### ✅任务执行完成\n- 记录总数：**3197条**\n- [打开AI表格](https://example.com/report)"
+  },
+  "at": {
+    "isAtAll": false
+  }
+}</div><div class="note">推荐用于带标题、粗体、图片和链接的报告；不要依赖完整 Markdown 渲染，表格建议改成列表。标题优先用 ####，颜色标签等扩展需在目标客户端验证。</div></section>
+<section class="slide"><div class="eyebrow">第六章 · 机器人 Webhook</div><h2>link：单链接卡片</h2><div class="code">{
+  "msgtype": "link",
+  "link": {
+    "title": "打开充值表格",
+    "text": "今天全部充值记录已导出",
+    "messageUrl": "https://example.com/report",
+    "picUrl": "https://example.com/report.png"
+  }
+}</div><div class="note">一个标题、摘要和图片对应一个跳转地址。示例 URL 需替换为实际报表地址。</div></section>
+<section class="slide"><div class="eyebrow">第六章 · 机器人 Webhook</div><h2>actionCard：按钮卡片</h2><div class="code">{
+  "msgtype": "actionCard",
+  "actionCard": {
+    "title": "充值报表已生成",
+    "text": "#### ✅完成\n共3197条充值记录",
+    "hideAvatar": "0",
+    "btnOrientation": "0",
+    "btns": [
+      {
+        "title": "打开表格",
+        "actionURL": "https://example.com/report"
+      }
+    ]
+  }
+}</div><div class="note">适合报表入口。btns 为独立跳转按钮；整体跳转使用 singleTitle + singleURL，不与 btns 混用。它不是可流式更新的互动卡片。</div></section>
+<section class="slide"><div class="eyebrow">第六章 · 机器人 Webhook</div><h2>feedCard：多图文链接列表</h2><div class="code">{
+  "msgtype": "feedCard",
+  "feedCard": {
+    "links": [
+      {
+        "title": "报表A",
+        "messageUrl": "https://example.com/a",
+        "picUrl": "https://example.com/a.png"
+      },
+      {
+        "title": "报表B",
+        "messageUrl": "https://example.com/b",
+        "picUrl": "https://example.com/b.png"
+      }
+    ]
+  }
+}</div><div class="note">适合一次发送多份报表或资讯，每个条目有自己的标题、图片和跳转地址。</div></section>
+<section class="slide"><div class="eyebrow">第六章 · 机器人 Webhook</div><h2>Webhook 消息发送效果</h2><p>群内实测截图：纯文本、Markdown、单按钮 / 多按钮 ActionCard、FeedCard。单按钮和多按钮属于同一个 actionCard msgtype。</p><div class="card" style="text-align:center"><img alt="Webhook 消息发送效果" src="webhook-message-examples.png" style="max-height:58vh;object-fit:contain"/></div></section>
+<section class="slide"><div class="eyebrow">第六章 · 机器人 Webhook</div><h2>连续发送测试：注意限流</h2><p>用户提供的测试图展示：连续发送 24 条，前 20 条成功、后 4 条被限流；这是本次测试结果。图中的“6 种格式”不表示 6 个 msgtype，ActionCard 可有两种按钮样式。生产发送应排队、合并通知并对限流进行退避重试。</p><div class="card" style="text-align:center"><img alt="连续发送测试：注意限流" src="webhook-rate-limit.png" style="max-height:58vh;object-fit:contain"/></div></section>
+<section class="slide"><div class="eyebrow">分享练习</div><h2>请你判断：这条消息会不会触发 Agent？</h2><div class="q"><p><b>场景：</b>群 G1 中用户 U1 发送了一条消息；机器人已经在群；但是配置 targets 中只有 G1 + U2。</p><p>问题：这条消息会进入 GroupQueue 吗？</p><button onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden">显示答案</button><div class="answer" hidden="">不会。acceptsTarget 要求 groupId + senderId 同时匹配，G1 + U1 不命中。</div></div><div class="q"><p><b>场景：</b>用户执行“打开 AI”，机器人不在群，但 Dashboard 未配置 Client ID。</p><p>问题：系统会怎样？</p><button onclick="this.nextElementSibling.hidden=!this.nextElementSibling.hidden">显示答案</button><div class="answer" hidden="">不会自动加群，会发送失败提示，要求先配置 Client ID 或手动加群。</div></div></section>
+</main><nav class="nav"><button onclick="go(-1)">上一页</button><span class="progress" id="pg"></span><button class="primary" onclick="go(1)">下一页</button></nav></div><script>const slides=[...document.querySelectorAll('.slide')];let i=0;function show(){slides.forEach((s,n)=>s.classList.toggle('on',n===i));document.getElementById('pg').textContent=(i+1)+' / '+slides.length;localStorage.setItem('skill_z-training-html-ppt-page',i)}function go(d){i=Math.max(0,Math.min(slides.length-1,i+d));show()}document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')go(1);if(e.key==='ArrowLeft')go(-1);if(e.key==='Home'){i=0;show()}if(e.key==='End'){i=slides.length-1;show()}});i=Math.max(0,Math.min(slides.length-1,Number(localStorage.getItem('skill_z-training-html-ppt-page')||0)));show();</script></body></html>
