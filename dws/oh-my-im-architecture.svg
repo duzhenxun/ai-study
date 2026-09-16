@@ -1,0 +1,76 @@
+<svg viewBox="0 0 1200 545" xmlns="http://www.w3.org/2000/svg" class="an" role="img" aria-label="oh-my-im 整体架构">
+<style>
+.an{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+.bx{fill:#ffffff;stroke:#93c5fd;stroke-width:1.6}
+.co{fill:#eff6ff;stroke:#2563eb;stroke-width:1.8}
+.ag{fill:#f0f9ff;stroke:#0284c7;stroke-width:1.8}
+.st{fill:#ecfdf5;stroke:#16a34a;stroke-width:1.8}
+.tt{font-size:14px;font-weight:700;fill:#1e40af;text-anchor:middle}
+.sb{font-size:11.5px;fill:#64748b;text-anchor:middle}
+.ed{stroke:#2563eb;stroke-width:1.6;fill:none;marker-end:url(#ar)}
+.ds{stroke:#94a3b8;stroke-width:1.4;fill:none;stroke-dasharray:5 4;marker-end:url(#ag)}
+.lb{font-size:11px;fill:#64748b;text-anchor:middle}
+</style>
+<defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 2L8 5L1 8" fill="none" stroke="#2563eb" stroke-width="1.6"/></marker><marker id="ag" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 2L8 5L1 8" fill="none" stroke="#94a3b8" stroke-width="1.6"/></marker></defs>
+<rect x="15" y="70" width="175" height="80" rx="12" class="bx"/>
+<text x="102.5" y="96" class="tt">钉钉私聊</text>
+<text x="102.5" y="116" class="sb">DingTalk Stream</text>
+<rect x="15" y="185" width="175" height="80" rx="12" class="bx"/>
+<text x="102.5" y="211" class="tt">DWS 群事件流</text>
+<text x="102.5" y="231" class="sb">NDJSON</text>
+<rect x="225" y="20" width="245" height="68" rx="12" class="co"/>
+<text x="347.5" y="46" class="tt">bot-worker</text>
+<text x="347.5" y="66" class="sb">私聊：去重 · 鉴权 · 命令</text>
+<rect x="225" y="100" width="245" height="78" rx="12" class="co"/>
+<text x="347.5" y="126" class="tt">group-worker</text>
+<text x="347.5" y="146" class="sb">群事件 · targets · 队列</text>
+<rect x="225" y="205" width="245" height="68" rx="12" class="co"/>
+<text x="347.5" y="231" class="tt">DWS CLI</text>
+<text x="347.5" y="251" class="sb">event · chat · drive · contact</text>
+<rect x="225" y="300" width="245" height="68" rx="12" class="co"/>
+<text x="347.5" y="326" class="tt">dashboard-worker</text>
+<text x="347.5" y="346" class="sb">管理页 · dws-dashboard.json</text>
+<rect x="505" y="45" width="225" height="95" rx="12" class="co"/>
+<text x="617.5" y="71" class="tt">runAgent</text>
+<text x="617.5" y="91" class="sb">agents/index.ts</text>
+<text x="617.5" y="107" class="sb">统一分发</text>
+<rect x="505" y="160" width="225" height="90" rx="12" class="co"/>
+<text x="617.5" y="186" class="tt">Session / Agent 切换</text>
+<text x="617.5" y="206" class="sb">按 Agent 隔离，切换不串线</text>
+<rect x="765" y="20" width="250" height="78" rx="12" class="ag"/>
+<text x="890.0" y="46" class="tt">Pi CLI</text>
+<text x="890.0" y="66" class="sb">pi --mode rpc · JSON-RPC</text>
+<text x="890.0" y="82" class="sb">支持 steer / abort</text>
+<rect x="765" y="113" width="250" height="78" rx="12" class="ag"/>
+<text x="890.0" y="139" class="tt">Codex CLI</text>
+<text x="890.0" y="159" class="sb">exec --json / app-server</text>
+<rect x="765" y="206" width="250" height="78" rx="12" class="ag"/>
+<text x="890.0" y="232" class="tt">OpenCode CLI</text>
+<text x="890.0" y="252" class="sb">opencode run --format json</text>
+<rect x="1050" y="70" width="135" height="140" rx="12" class="st"/>
+<text x="1117.5" y="96" class="tt">输出</text>
+<text x="1117.5" y="116" class="sb">文本</text>
+<text x="1117.5" y="132" class="sb">互动卡片</text>
+<text x="1117.5" y="148" class="sb">Webhook 推送</text>
+<rect x="15" y="420" width="1170" height="95" rx="12" class="st"/>
+<text x="600.0" y="446" class="tt">持久化 ~/.oh-my-im/</text>
+<text x="600.0" y="466" class="sb">private-sessions.json · group-sessions.json · dws-cards.json · replies/</text>
+<line x1="190" y1="110" x2="225" y2="54" class="ed"/>
+<line x1="190" y1="225" x2="225" y2="139" class="ed"/>
+<line x1="470" y1="54" x2="505" y2="80" class="ed"/>
+<line x1="470" y1="139" x2="505" y2="110" class="ed"/>
+<line x1="470" y1="334" x2="505" y2="130" class="ds"/>
+<text x="490" y="252" class="lb">配置</text>
+<line x1="347" y1="178" x2="347" y2="205" class="ds"/>
+<text x="408" y="196" class="lb">事件 / 群管理</text>
+<line x1="730" y1="92" x2="765" y2="59" class="ed"/>
+<line x1="730" y1="92" x2="765" y2="152" class="ed"/>
+<line x1="730" y1="92" x2="765" y2="245" class="ed"/>
+<line x1="1015" y1="59" x2="1050" y2="105" class="ed"/>
+<line x1="1015" y1="152" x2="1050" y2="140" class="ed"/>
+<line x1="1015" y1="245" x2="1050" y2="175" class="ed"/>
+<line x1="617" y1="250" x2="617" y2="420" class="ds"/>
+<text x="675" y="335" class="lb">Session 持久化</text>
+<line x1="1117" y1="210" x2="1117" y2="420" class="ds"/>
+<text x="1060" y="335" class="lb">回复历史</text>
+</svg>
