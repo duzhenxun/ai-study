@@ -10,25 +10,44 @@ html,body{min-height:0}.deck{min-height:0;overflow:hidden}.slide{min-height:0;he
 <section class="slide"><div class="eyebrow">第一章 · 项目总览</div><h2>项目整体架构</h2><p class="lead">从消息入口、Worker、核心路由到 Pi / Codex / OpenCode 执行层的完整视图。</p><div class="card" style="margin-top:22px;text-align:center;padding:14px"><img alt="项目整体架构图" src="oh-my-im-architecture.png" style="display:block;width:100%;max-height:60vh;object-fit:contain;border-radius:8px"/></div><div class="footer">讲解顺序：入口 → Worker → 核心服务 → Agent 执行 → 持久化</div></section>
 <section class="slide"><div class="eyebrow">第一章 · DWS 基础</div><h2>DWS 是什么？</h2><div class="grid two"><div class="card"><h3>DingTalk Workspace CLI</h3><p>DWS 是面向钉钉工作台能力的命令行工具，负责认证、群聊、联系人、机器人和事件流操作。</p></div><div class="card"><h3>本项目中的位置</h3><p>DWS 不执行 AI，它负责把群消息送进 Worker，并提供群、成员、机器人等管理能力。</p></div></div><div class="note">理解 DWS 的关键：它是消息与钉钉资源的控制入口，不是模型执行引擎。</div></section>
 
-<section class="slide"><div class="eyebrow">第一章 · DWS 实战命令 · 1</div><h2>登录当前 DWS 账号</h2><div class="code">dws auth status
-dws auth login --device
-dws contact +me</div><div class="grid two"><div class="card"><h3>auth status</h3><p>查看 authenticated、企业、当前账号和 Token 有效期。</p></div><div class="card"><h3>contact +me</h3><p>获取当前 DWS 登录用户的 userId、openDingTalkId 和姓名。</p></div></div><div class="note">事件监听和群消息查询依赖本机 DWS 登录状态。</div></section>
-<section class="slide"><div class="eyebrow">第一章 · DWS 实战命令 · 2</div><h2>监听指定人的消息</h2><div class="code">dws event +listen-im --kind sender \
-  --open-dingtalk-id '&lt;openDingTalkId&gt;' --format ndjson
+<section class="slide"><div class="eyebrow">第一章 · DWS 实战命令 · 1</div><h2>DWS 事件：两种消费方式</h2><div class="grid two"><div class="card"><span class="tag">原始消费</span><div class="code">dws event consume \
+  user_im_message_receive_group_all</div><p>返回完整事件信封：seq、event_id、subscribe_id、data（JSON 字符串）与 headers。</p></div><div class="card"><span class="tag">简化监听</span><div class="code">dws event +listen-im --kind all-group</div><p>返回扁平字段：message_id、conversation_id、sender、content、create_time。</p></div></div><div class="table-wrap"><table><tr><th>事件类型</th><th>监听方式</th><th>场景</th></tr><tr><td>user_im_message_receive_group_all</td><td>--kind all-group</td><td>全量群消息</td></tr><tr><td>user_im_message_receive_o2o_all</td><td>--kind all-direct</td><td>私聊消息</td></tr><tr><td>user_im_message_receive_user</td><td>--kind sender</td><td>指定人消息，群聊与私聊都会返回</td></tr></table></div><div class="note">consume 拿到的是原始信封，listen-im 拿到的是整理后的 NDJSON，日常监听优先用 listen-im。</div></section>
+<section class="slide"><div class="eyebrow">第一章 · DWS 实战命令 · 2</div><h2>群消息事件</h2><div class="code">dws event +listen-im --kind all-group
 
-dws event +listen-im --kind sender \
-  --user-query '师超' --format ndjson</div><p class="lead">适合按人员订阅 IM 消息；输出是 NDJSON，可以被程序逐行消费。</p><div class="q"><b>事件字段重点</b><p>event_id、message_id、conversation_id、sender_open_dingtalk_id、content、create_time。</p></div></section>
-<section class="slide"><div class="eyebrow">第一章 · DWS 实战命令 · 3</div><h2>监听全量群消息</h2><div class="code">dws event +listen-im \
-  --kind all-group \
-  --events message \
-  --format ndjson</div><div class="flow"><div class="node">DWS Event Bus</div><div class="arrow">→</div><div class="node">NDJSON</div><div class="arrow">→</div><div class="node">group-worker</div><div class="arrow">→</div><div class="node">规则过滤</div></div><p class="lead">事件流连接成功，只代表订阅成功；是否触发 AI，还要看群和发送人规则。</p></section>
-<section class="slide"><div class="eyebrow">第一章 · DWS 实战命令 · 4</div><h2>查群、查消息、查成员</h2><div class="code">dws chat search --query '群名称'
-dws chat +chat-list --types group --page-size 5
-dws chat message list --group '&lt;openConversationId&gt;' \
-  --time '...' --direction newer --limit 50 --format json
-dws chat +chat-members-list --conversation-id '&lt;groupId&gt;'
-dws chat +search-msg --sender '姓名' --days 1 \
-  --chat-type group --limit 3 --order desc --format json</div><div class="note">群名用于搜索；后续发送、查消息和加机器人必须使用准确的 openConversationId。</div></section>
+[event] ready event_key=user_im_message_receive_group_all
+{"type":"user_im_message_receive_group_all",
+ "event_id":"3eb1ce4b981348529e8c48759b9b2cf2",
+ "message_id":"msgYqeVn7+T9BhNImpr3b8NFA==",
+ "conversation_id":"cidg39FaVefjLlwptxUXexldA==",
+ "sender":"师超",
+ "sender_open_dingtalk_id":"DZyRu3o9aXvlGxMUTUPPHsq2jv4dYMQ8l",
+ "content":"abcd",
+ "create_time":"2026-09-04 17:37:17",
+ "event_time":1788514637689}</div><div class="grid two"><div class="card"><h3>关键字段</h3><p>message_id、conversation_id、sender_open_dingtalk_id、content、create_time。</p></div><div class="card"><h3>非文本消息</h3><p>图片 / 语音 / 视频 / 文件的 content 只是提示文本，需要再取 resourceId 或 fileId 下载。</p></div></div></section>
+<section class="slide"><div class="eyebrow">第一章 · DWS 实战命令 · 3</div><h2>私聊与指定人消息事件</h2><div class="grid two"><div class="card"><span class="tag">私聊</span><div class="code">dws event +listen-im --kind all-direct</div><p>事件类型：user_im_message_receive_o2o_all。</p></div><div class="card"><span class="tag">指定人</span><div class="code">dws event +listen-im --kind sender \
+  --user-query '师超' --format ndjson</div><p>事件类型：user_im_message_receive_user，群消息与私聊都会返回。</p></div></div><div class="code">{"type":"user_im_message_receive_user",
+ "message_id":"msg0wKf6DK3ZlXhynaLZoBR+w==",
+ "conversation_id":"cidGdq23wiTgsVmq/CKZCwkig==",
+ "sender":"师超",
+ "sender_open_dingtalk_id":"DZyRu3o9aXvlGxMUTUPPHsq2jv4dYMQ8l",
+ "content":"1234",
+ "create_time":"2026-09-09 16:49:00"}</div></section>
+<section class="slide"><div class="eyebrow">第一章 · DWS 实战命令 · 4</div><h2>历史消息与媒体下载</h2><div class="grid two"><div class="card"><h3>历史消息</h3><div class="code">dws chat message list \
+  --group 'cid/32MCmqOKuXcf6JpC4nDCw==' \
+  --direction older --limit 2
+
+dws chat +search-msg --sender "杜振训" \
+  --days 1 --chat-type group --limit 3</div></div><div class="card"><h3>媒体下载</h3><div class="code">dws chat message list-by-ids \
+  --msg-ids 'msgwuiR+8NFOQYCqvKb0hWvRA=='
+
+dws chat message download-media \
+  --type mediaId --resource-id '&lt;resourceId&gt;' \
+  --message-id '&lt;msgId&gt;' \
+  --open-conversation-id '&lt;cid&gt;' \
+  --output ./downloads/</div></div></div><div class="grid two"><div class="card"><h3>文件下载</h3><div class="code">dws drive +download --node &lt;fileId&gt; \
+  --output ./downloads/
+
+dws drive download --node &lt;fileId&gt; --url-only</div></div><div class="card"><h3>下载顺序</h3><p>先用 list-by-ids 拿 resourceId，再 download-media；文件用 drive download，也可以用 --url-only 只取直链。</p></div></div><div class="note">图片、语音、视频走 chat message download-media；文件走 drive download。</div></section>
 <section class="slide"><div class="eyebrow">第一章 · DWS 实战命令 · 5</div><h2>查找、加入与查看机器人</h2><div class="code">dws chat bot find --query '机器人名称' --format json
 dws chat +chat-add-bot \
   --robot-code '&lt;robotCode&gt;' \
